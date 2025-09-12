@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project 1</title>
+    <style>
+        body {
+            font-family: Calibri, Calibri;
+            width: 145%;
+            height: 100%;
+            padding: 0px;
+            margin-left: 2%;
+            transform: scale(0.67);
+            transform-origin: top left;
+        }
+        h1 {
+            font-size: 48px;
+        }
+
+        h2 {
+            font-size: 32px;
+        }
+
+        figcaption {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 5px;
+        }
+
+        p {
+            font-size: 24px;
+            margin: 40px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        table {
+            margin: auto;
+            border-collapse: collapse;
+            font-size: 24px;
+        }
+
+        td {
+            text-align: center;
+            vertical-align: top;
+            padding: 15px;
+            padding-top: 0px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Project 1: Images of the Russian Empire -- Colorizing the Prokudin-Gorskii Photo Collection</h1>
+    <h2>Overview</h2>
+    <p>
+        In the 20th century, before color photography was available, Sergei Mikhailovich Prokudin-Gorskii used a special camera to take three black and white photos of the same scene through red, green, and blue filters.
+        In this project, I took those black and white photos and combined them into a single colored photo.
+        Throughout this project, I explored different methods of aligning the images to produce a visually appealing result.
+        It was interesting to compute different metrics to measure the quality of the alignment and optimize the algorithm to produce a clear yet also efficient result.
+    </p>
+    <h2>Image Metrics</h2>
+    <p>
+        The first metric I implemented was the Euclidean distance, which computes the sum of squared differences between two images.
+        This metric works well when the images are already closely aligned and have similar brightness levels. 
+        However, because of its sensitivity to brightness changes, I also implemented the Normalized Cross-Correlation metric which is the dot product between two normalized images.
+        This metric can handle differences in brightness and contrast better as it focuses on the relative patterns in the images rather than their absolute values.
+        However, it is computationally more expensive than the Euclidean distance.
+    </p>
+
+    <p>
+        Below are some examples of images aligned using both metrics:
+    </p>
+
+    <div style="display: flex; justify-content: center; gap: 0px;">
+        <figure>
+            <img src="images/euclidean_cathedral.jpg" alt="closest" width="450">
+            <figcaption>cathedral (euclidean metric)</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/ncc_cathedral.jpg" alt="furthest" width="450">
+            <figcaption>cathedral (ncc metric)</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/euclidean_emir.jpg" alt="closest" width="450">
+            <figcaption>emir (euclidean metric)</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/ncc_emir.jpg" alt="furthest" width="450">
+            <figcaption>emir (ncc metric)</figcaption>
+        </figure>
+    </div>
+    <p>
+        The images aligned using the Euclidean distance metric appear to be very similar to the images aligned using the Normalized Cross-Correlation metric.
+        This is because the border of the images dominate the metric calculations and both metrics favor the same alignments.
+        Now, let's try to improve our alignment by modifying the images before computing the metrics.
+    </p>
+
+    <h2>Improvements</h2>
+
+    <p>
+        The first improvement I made was to crop the borders of the images before computing the metrics to reduce the influence of the borders on the alignment.
+        For every shift, I cropped 5% of the width and height from each side of the image.
+        Below are some examples of images aligned using both metrics with cropped borders before computing the metrics:
+    </p>
+
+    <div style="display: flex; justify-content: center; gap: 0px;">
+        <figure>
+            <img src="images/cropped_euclidean_cathedral.jpg" alt="closest" width="450">
+            <figcaption>cathedral (euclidean metric)</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/cropped_ncc_cathedral.jpg" alt="furthest" width="450">
+            <figcaption>cathedral (ncc metric)</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/cropped_euclidean_emir.jpg" alt="closest" width="450">
+            <figcaption>emir (euclidean metric)</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/cropped_ncc_emir.jpg" alt="furthest" width="450">
+            <figcaption>emir (ncc metric)</figcaption>
+        </figure>
+    </div>
+
+    <p>
+        From the images, we can see that cropping the borders before computing the metrics helps produce a clearer alignment as the borders no longer dominate the metric calculations.
+        Instead, the metric focuses more on the actual contents of the images.
+        While the Euclidean distance metric still produces a similar alignment to the Normalized Cross-Correlation metric for the cathedral, we can see a bigger difference between Emir.
+        The Euclidean distance metric produces a blurrier alignment compared to the Normalized Cross-Correlation metric because the original images have different brightness levels, which is sensitive to the Euclidean distance metric.
+        The Normalized Cross-Correlation metric is able to handle the brightness differences better and produces a better alignment.
+    </p>
+
+    <p>
+        <b>Below are some images that are aligned with single-scale alignment:</b>
+    </p>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/ss_euclidean_cathedral.jpg" alt="furthest" width="450">
+                    <figcaption>cathedral (euclidean metric)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/ss_euclidean_monastery.jpg" alt="furthest" width="450">
+                    <figcaption>monastery (euclidean metric)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/ss_euclidean_tobolsk.jpg" alt="furthest" width="450">
+                    <figcaption>tobolsk (euclidean metric)</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/ss_ncc_cathedral.jpg" alt="furthest" width="450">
+                    <figcaption>cathedral (ncc metric)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/ss_ncc_monastery.jpg" alt="furthest" width="450">
+                    <figcaption>monastery (ncc metric)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/ss_ncc_tobolsk.jpg" alt="furthest" width="450">
+                    <figcaption>tobolsk (ncc metric)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Another improvement I implemented was the image pyramid which helps speed up the alignment process.
+        For larger .tif images, the original alignment algorithm can be very slow since it is computing the metrics for all possible shifts in the full resolution image.
+        To reduce the runtime, the image pyramid starts by aligning a downsampled version of the images to get a rough estimate of the best alignment.
+        From there, I took the best shift and used it as a starting point for the next level where I only shifted by 10 pixels in each direction.
+        This process is repeated until the original resolution is reached.
+        This significantly reduces the number of shifts that need to be evaluated at each level, speeding up the alignment process to be far less than one minute for .tif images.
+    </p>
+
+    <h2>Challenges</h2>
+    
+    <p>
+        While working on this project, I outputted a lot of misaligned images and had to come up with clever ways to improve the alignment.
+        It was difficult to come up with ideas to resolve this issue and I had to consult peers and staff for help.
+        I found that one of the best solutions was cropping the borders of the images before computing the metrics.
+        It was fascinating to see how the output improves drastically from this change.
+    </p>
+
+    <p>
+        Additionally, I encountered a few bugs that altered the output images in unexpected ways.
+        One bug that made a big difference was when I was constructing my image pyramid.
+        At every level, I would explore 10 pixels around the best shift from the previous level to search for the best shift at the next level.
+        However, I mistakenly shifted around the original pixel coordinates of the downsampled image instead of scaling to the equivalent coordinate in the higher resolution image.
+        This restricted which pixels were being calculated during the shifting but after fixing this, the image looked a lot better.
+    </p>
+
+    <p>Below is a comparison of how this bug effected my output:</p>
+
+    <div style="display: flex; justify-content: center; gap: 0px;">
+        <figure>
+            <img src="images/bugged_ncc_emir.jpg" alt="closest" width="450">
+            <figcaption>emir (buggy)</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/cropped_ncc_emir.jpg" alt="furthest" width="450">
+            <figcaption>emir (fixed)</figcaption>
+        </figure>
+    </div>
+
+    <h2>Images and Offsets with Multi-Scale Pyramid Alignment</h2>
+
+    <table>
+        <tr>
+            <td><b>Euclidean Distance Metric</b></td>
+            <td><b>CNN Metric</b></td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/cropped_euclidean_cathedral.jpg" alt="closest" width="900">
+                    <figcaption>
+                        cathedral <br>
+                        g shift: (5, 2), r shift: (12, 3)
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/cropped_ncc_cathedral.jpg" alt="closest" width="900">
+                    <figcaption>
+                        cathedral <br>
+                        g shift: (5, 2), r shift: (12, 3)
+                    </figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/cropped_euclidean_church.jpg" alt="closest" width="900">
+                    <figcaption>
+                        church <br>
+                        g shift: (25, 3), r shift: (58, -5)
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/cropped_ncc_church.jpg" alt="closest" width="900">
+                    <figcaption>
+                        church <br>
+                        g shift: (25, 3), r shift: (58, -5)
+                    </figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/cropped_euclidean_emir.jpg" alt="closest" width="900">
+                    <figcaption>
+                        emir <br>
+                        g shift: (49, 24), r shift: (88, 43)
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/cropped_ncc_emir.jpg" alt="closest" width="900">
+                    <figcaption>
+                        emir <br>
+                        g shift: (49, 24), r shift: (103, 43)
+                    </figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/cropped_euclidean_harvesters.jpg" alt="closest" width="900">
+                    <figcaption>
+                        harvesters <br>
+                        g shift: (60, 16), r shift: (124, 13)
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/cropped_ncc_harvesters.jpg" alt="closest" width="900">
+                    <figcaption>
+                        hervesters <br>
+                        g shift: (60, 16), r shift: (124, 14)
+                    </figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/cropped_euclidean_icon.jpg" alt="closest" width="900">
+                    <figcaption>
+                        icon <br>
+                        g shift: (41, 17), r shift: (89, 23)
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/cropped_ncc_icon.jpg" alt="closest" width="900">
+                    <figcaption>
+                        icon <br>
+                        g shift: (40, 17), r shift: (89, 23)
+                    </figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/cropped_euclidean_italil.jpg" alt="closest" width="900">
+                    <figcaption>
+                        italil <br>
+                        g shift: (38, 21), r shift: (77, 35)
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/cropped_ncc_italil.jpg" alt="closest" width="900">
+                    <figcaption>
+                        italil <br>
+                        g shift: (38, 21), r shift: (77, 35)
+                    </figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/cropped_euclidean_lastochikino.jpg" alt="closest" width="900">
+                    <figcaption>
+                        lastochikino <br>
+                        g shift: (-3, -2), r shift: (76, -9)
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/cropped_ncc_lastochikino.jpg" alt="closest" width="900">
+                    <figcaption>
+                        lastochikino <br>
+                        g shift: (-3, -2), r shift: (76, -9)
+                    </figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/cropped_euclidean_lugano.jpg" alt="closest" width="900">
+                    <figcaption>
+                        lugano <br>
+                        g shift: (41, -17), r shift: (93, -29)
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/cropped_ncc_lugano.jpg" alt="closest" width="900">
+                    <figcaption>
+                        lugano <br>
+                        g shift: (41, -17), r shift: (92, -28)
+                    </figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/cropped_euclidean_melons.jpg" alt="closest" width="900">
+                    <figcaption>
+                        melons <br>
+                        g shift: (82, 9), r shift: (177, 11)
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/cropped_ncc_melons.jpg" alt="closest" width="900">
+                    <figcaption>
+                        melons <br>
+                        g shift: (82, 9), r shift: (177, 11)
+                    </figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/cropped_euclidean_monastery.jpg" alt="closest" width="900">
+                    <figcaption>
+                        monastery <br>
+                        g shift: (-3, 2), r shift: (3, 2)
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/cropped_ncc_monastery.jpg" alt="closest" width="900">
+                    <figcaption>
+                        monastery <br>
+                        g shift: (-3, 2), r shift: (3, 2)
+                    </figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/cropped_euclidean_self_portrait.jpg" alt="closest" width="900">
+                    <figcaption>
+                        self portrait <br>
+                        g shift: (79, 29), r shift: (175, 34)
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/cropped_ncc_self_portrait.jpg" alt="closest" width="900">
+                    <figcaption>
+                        self portrait <br>
+                        g shift: (79, 29), r shift: (175, 34)
+                    </figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/cropped_euclidean_siren.jpg" alt="closest" width="900">
+                    <figcaption>
+                        siren <br>
+                        g shift: (49, -7), r shift: (96, -25)
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/cropped_ncc_siren.jpg" alt="closest" width="900">
+                    <figcaption>
+                        siren <br>
+                        g shift: (49, -7), r shift: (96, -25)
+                    </figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/cropped_euclidean_three_generations.jpg" alt="closest" width="900">
+                    <figcaption>
+                        three generations <br>
+                        g shift: (55, 13), r shift: (112, 10)
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/cropped_ncc_three_generations.jpg" alt="closest" width="900">
+                    <figcaption>
+                        three generations <br>
+                        g shift: (55, 13), r shift: (112, 10)
+                    </figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/cropped_euclidean_tobolsk.jpg" alt="closest" width="900">
+                    <figcaption>
+                        tobolsk <br>
+                        g shift: (3, 2), r shift: (6, 3)
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/cropped_ncc_tobolsk.jpg" alt="closest" width="900">
+                    <figcaption>
+                        tobolsk <br>
+                        g shift: (3, 2), r shift: (6, 3)
+                    </figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>More Images and Offsets</h2>
+    <table>
+        <tr>
+            <td><b>Euclidean Distance Metric</b></td>
+            <td><b>CNN Metric</b></td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/cropped_euclidean_garden.jpg" alt="closest" width="900">
+                    <figcaption>
+                        garden <br>
+                        g shift: (33, -11), r shift: (140, -27)
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/cropped_ncc_garden.jpg" alt="closest" width="900">
+                    <figcaption>
+                        garden <br>
+                        g shift: (33, -11), r shift: (140, -26)
+                    </figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/cropped_euclidean_flowers.jpg" alt="closest" width="900">
+                    <figcaption>
+                        flowers <br>
+                        g shift: (8, 8), r shift: (60, 13)
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/cropped_ncc_flowers.jpg" alt="closest" width="900">
+                    <figcaption>
+                        flowers <br>
+                        g shift: (8, 8), r shift: (60, 13)
+                    </figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/cropped_euclidean_train.jpg" alt="closest" width="900">
+                    <figcaption>
+                        train <br>
+                        g shift: (28, -7), r shift: (108, -8)
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/cropped_ncc_train.jpg" alt="closest" width="900">
+                    <figcaption>
+                        train <br>
+                        g shift: (28, -7), r shift: (108, -8)
+                    </figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
