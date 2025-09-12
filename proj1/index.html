@@ -192,7 +192,7 @@
         For larger .tif images, the original alignment algorithm can be very slow since it is computing the metrics for all possible shifts in the full resolution image.
         To reduce the runtime, the image pyramid starts by aligning a downsampled version of the images to get a rough estimate of the best alignment.
         From there, I took the best shift and used it as a starting point for the next level where I only shifted by 10 pixels in each direction.
-        This process is repeated until the original resolution is reached.
+        I started with images that were downsampled until it was 32 by 32 pixels (about 7 levels) and repeated this process until the original resolution is reached.
         This significantly reduces the number of shifts that need to be evaluated at each level, speeding up the alignment process to be far less than one minute for .tif images.
     </p>
 
