@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project 2</title>
+    <style>
+        body {
+            font-family: Calibri, Calibri;
+            width: 145%;
+            height: 100%;
+            padding: 0px;
+            margin-left: 2%;
+            transform: scale(0.67);
+            transform-origin: top left;
+        }
+        h1 {
+            font-size: 48px;
+        }
+
+        h2 {
+            font-size: 32px;
+        }
+
+        figcaption {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 5px;
+        }
+
+        p {
+            font-size: 24px;
+            margin: 40px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        table {
+            margin: auto;
+            border-collapse: collapse;
+            font-size: 24px;
+        }
+
+        td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 15px;
+            padding-top: 0px;
+        }
+
+        pre {
+            margin: 0;
+            padding-left: 0;
+            white-space: pre;
+        }
+
+        pre code {
+            font-size: 18px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Project 2: Fun with Filters and Frequencies</h1>
+    <h2>Overview</h2>
+    <p>
+        In this project, I implemented various image filtering techniques by convoluting images with different kernels.
+        I learned how to use image gradients to detect edges and how to use Gaussian filters to blur images.
+        From there, I was able to play with different filters to achieve different effects, such as sharpening images and creating blended images.
+    </p>
+
+    <p>
+        The coolest thing I learned in this project was how to blend images together with Gaussian and Laplacian stacks.
+        It was fun to find images that were similar to each other and produce a seamless blend.
+    </p>
+
+    <h2>Part 1.1: Convolutions from Scratch!</h2>
+    <p>
+        In this part, I implemented 2D convolution from scratch using three different methods: four nested for loops, two nested for loops, and using the scipy library's convolve2d function.
+    </p>
+    <table style="margin: 0;">
+        <tr>
+            <td style="margin: 0; text-align: left; vertical-align: top;">
+                <p>
+                    Here is my four nested for loop implementation:
+                </p>
+                    <pre><code>
+    def convolve_four_loops(img, filter):
+        # flip filter
+        filter = filter[::-1, ::-1]
+
+        # get dimensions
+        img_y, img_x = img.shape
+        filter_y, filter_x = filter.shape
+        output_x = img_x - filter_x + 1
+        output_y = img_y - filter_y + 1
+        output = np.zeros((output_y, output_x), dtype=img.dtype)
+
+        # do convolution
+        for row in range(output_y):
+            for col in range(output_x):
+                total = 0
+                for filter_row in range(filter_y):
+                    for filter_col in range(filter_x):
+                        img_row = row + filter_row
+                        img_col = col + filter_col
+                        total += img[img_row, img_col] * filter[filter_row, filter_col]
+                output[row, col] = total
+        return output
+                    </code></pre>
+                </p>
+            </td>
+            <td style="margin: 0; text-align: left; vertical-align: top;">
+                <p>
+                    Here is my two nested for loop implementation:
+                </p>
+                    <pre><code>
+        def convolve_two_loops(img, filter):
+            # flip filter
+            filter = filter[::-1, ::-1]
+
+            # get dimensions
+            img_y, img_x = img.shape
+            filter_y, filter_x = filter.shape
+            output_x = img_x - filter_x + 1
+            output_y = img_y - filter_y + 1
+            output = np.zeros((output_y, output_x), dtype=img.dtype)
+
+            # do convolution
+            for row in range(output_y):
+                for col in range(output_x):
+                    submatrix = img[row:row + filter_y, col:col + filter_x]
+                    output[row, col] = np.sum(submatrix * filter)
+            return output
+                    </code></pre>
+                </p>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Below are the resulting convolutions from the three method (and their runtimes):
+    </p>
+
+    <div style="display: flex; justify-content: center; gap: 0px;">
+        <figure>
+            <img src="images/part1_1_gray_selfie.jpg" alt="closest" width="450">
+            <figcaption>gray selfie</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/part1_1_four_loops.jpg" alt="furthest" width="450">
+            <figcaption>four for loops (2m 13.6s)</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/part1_1_two_loops.jpg" alt="closest" width="450">
+            <figcaption>two for loops (19.1s)</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/part1_1_scipy.jpg" alt="furthest" width="450">
+            <figcaption>convolve2d (0.0s)</figcaption>
+        </figure>
+    </div>
+    <p>
+        As you can see, multiplying each element and summing them up using four nested for loops is very inefficient.
+        By reducing the number of loops to two, I was able to speed up the process because of the parallelization of numpy operations.
+        However, the most efficient method was using the scipy library's convolve2d function, which is implemented in C and optimized for performance.
+
+        For each image, I had to pad it with zeros to ensure that the output image had the same dimensions as the input image.
+        For the four and two nested for loop implementations, I padded the image with (filter size - 1) / 2 zeros.
+        For the scipy implementation, I used the 'same' mode, which automatically pads the image with zeros and outputs an image of the same size as the input image.
+        The outputs of each method are the same and the three images are all a bit blurrier than the original gray image (zoom in for a more obvious difference.)
+    </p>
+
+    <p>
+        Next, I applied the dx and dy filters to the gray selfie image using the scipy convolve2d function.
+        The dx filter detects horizontal edges, while the dy filter detects vertical edges.
+    </p>
+    <p>
+        Below are the outputs of the convolutions:
+    </p>
+
+    <div style="display: flex; justify-content: center; gap: 0px;">
+        <figure>
+            <img src="images/part1_1_dx_scipy.jpg" alt="closest" width="450">
+            <figcaption>dx filter</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/part1_1_dy_scipy.jpg" alt="furthest" width="450">
+            <figcaption>dy filter</figcaption>
+        </figure>
+    </div>
+
+    <h2>Part 1.2: Finite Difference Operator</h2>
+
+    <p>
+        In this part, I used the dx and dy filters to compute the gradient magnitude and edge map of the cameraman image.
+        The gradient magnitude is computed as the square root of the sum of the squares of the dx and dy convolutions.
+        The edge map is computed by thresholding the gradient magnitude at a value of 0.25 and outputting a binary image.
+        I chose the threshold value of 0.25 because it produced a good balance between detecting edges and reducing noise.
+        A lower threshold would result in more noise, while a higher threshold would result in fewer edges being detected.
+    </p>
+    <p>
+        Below are the outputs of the convolutions, gradient magnitude, and edge map:
+    </p>
+
+    <div style="display: flex; justify-content: center; gap: 0px;">
+        <figure>
+            <img src="images/part1_2_dx.jpg" alt="closest" width="450">
+            <figcaption>dx filter</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/part1_2_dy.jpg" alt="furthest" width="450">
+            <figcaption>dy filter</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/part1_2_gradient.jpg" alt="closest" width="450">
+            <figcaption>gradient</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/part1_2_edge.jpg" alt="furthest" width="450">
+            <figcaption>edge</figcaption>
+        </figure>
+    </div>
+
+    <h2>Part 1.3: Derivative of Gaussian (DoG) Filter</h2>
+    
+    <p>
+        In this part, I improved the edge detection by first applying a Gaussian filter to the image before applying the dx and dy filters.
+        This helps to reduce noise in the previous image and produce cleaner edges.
+        I implemented this using two different methods.
+    </p>
+
+    <p>
+        For the first method, I blurred the image using a Gaussian filter. Then, I applied the dx and dy filters to the blurred image to compute the gradient magnitude and edge map.
+        As you can see, the edges are much cleaner and more defined compared to the previous part while using the same threshold value.
+        This is because the Gaussian filter smooths out the noise in the image, allowing the dx and dy filters to better detect the true edges.
+    </p>
+
+    <p>Below are the outputs of this first method:</p>
+
+    <div style="display: flex; justify-content: center; gap: 0px;">
+        <figure>
+            <img src="images/part1_3_gaussain_dx.jpg" alt="closest" width="450">
+            <figcaption>dx filter</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/part1_3_gaussain_dy.jpg" alt="furthest" width="450">
+            <figcaption>dy filter</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/part1_3_gaussain_gradient.jpg" alt="closest" width="450">
+            <figcaption>gradient</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/part1_3_gaussain_edge.jpg" alt="furthest" width="450">
+            <figcaption>edge</figcaption>
+        </figure>
+    </div>
+
+    <p>
+        For the second method, I created derivative of Gaussian (DoG) filters by convolving the Gaussian filter with the dx and dy filters.
+        Then, I applied the DoG filters to the original image to compute the gradient magnitude and edge map.
+        The outputs are very similar to the first method, but I changed the threshold to be 0.35.
+    </p>
+
+    <p>
+        Below are the outputs of this second method:
+    </p>
+
+    <div style="display: flex; justify-content: center; gap: 0px;">
+        <figure>
+            <img src="images/part1_3_dogx.jpg" alt="closest" width="450">
+            <figcaption>DoGx</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/part1_3_dogy.jpg" alt="furthest" width="450">
+            <figcaption>DoGy</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/part1_3_dog_gradient.jpg" alt="closest" width="450">
+            <figcaption>gradient</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/part1_3_dog_edge.jpg" alt="furthest" width="450">
+            <figcaption>edge</figcaption>
+        </figure>
+    </div>
+
+    <h2>Part 2.1: Image "Sharpening"</h2>
+
+    <p>
+        In this part, I implemented image sharpening by creating an unsharp mask filter (following the formula from lecture.)
+        <div style="display: flex; justify-content: center; gap: 0px;">
+            <figure>
+                <img src="images/part2_1_filter_formula.png" alt="closest" width="600">
+            </figure>
+        </div>
+    </p>
+
+    <p>
+        Image sharpening is done by enhancing the high frequency components of an image, which can be done by subtracting a blurred version of the image from the original image.
+        The blurred version is created by convolving the image with a Gaussian filter and the sharpness is controlled by the alpha parameter.
+        A higher alpha value results in a sharper image since we are adding more of the high frequency components back to the original image.
+    </p>
+
+    <p>
+        Below are the results of each step of the sharpening process:
+    </p>
+
+   <div style="display: flex; justify-content: center; gap: 0px;">
+        <figure>
+            <img src="images/part2_1_taj.jpg" alt="closest" width="450">
+            <figcaption>original</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/part2_1_taj_gaussian.jpg" alt="furthest" width="450">
+            <figcaption>blurred (gradient)</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/part2_1_taj_high_freq.jpg" alt="closest" width="450">
+            <figcaption>high-frequency (original - blurred)</figcaption>
+        </figure>
+
+        <figure>
+            <img src="images/part2_1_taj_sharpened.jpg" alt="furthest" width="450">
+            <figcaption>sharpened (alpha = 2)</figcaption>
+        </figure>
+    </div>
+
+    <p>
+        Below are more results of the sharpening process with different alpha values:
+    </p>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_1_kodak.jpg" alt="closest" width="600">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_1_kodak_gaussian.jpg" alt="closest" width="600">
+                    <figcaption>blurred</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_1_kodak_high_freq.jpg" alt="closest" width="600">
+                    <figcaption>high-frequency</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_1_kodak_sharpened1.jpg" alt="closest" width="600">
+                    <figcaption>sharpened (alpha = 1)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_1_kodak_sharpened2.jpg" alt="closest" width="600">
+                    <figcaption>sharpened (alpha = 2)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_1_kodak_sharpened3.jpg" alt="closest" width="600">
+                    <figcaption>sharpened (alpha = 3)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        When the alpha value increases, the image becomes sharper, but it also introduces more noise.
+        This is because the high-frequency components of the image are increased, which can also increase noise in the image.
+        We can see that the high-frequency image contains a lot of noise and how that is reflected at each level.
+    </p>
+
+    <p>
+        Next, I blurred an image and tried to recover the original image by sharpening the blurry image.
+        Below are the reults of this attempt:
+    </p>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_1_kodak.jpg" alt="closest" width="600">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_1_kodak_blurry.jpg" alt="closest" width="600">
+                    <figcaption>blurred</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_1_kodak_resharpened.jpg" alt="closest" width="600">
+                    <figcaption>resharpened (alpha = 2.5)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        As you can see, the sharpened image is not exactly the same as the original image, but it is a lot clearer than the blurry image.
+        This is because the high-frequency details are lost when the image is blurred, and sharpening can only amplify the existing high-frequency components in the blurry image.
+    </p>
+
+    <h2>Part 2.2: Hybrid Images</h2>
+
+    <p>
+        In this part, I created hybrid images by combining the low-frequency components of one image with the high-frequency components of another image.
+        The low-frequency components are obtained by convolving the image with a Gaussian filter, while the high-frequency components are obtained by subtracting the low-frequency components from the original image.
+        The Gaussian filter is defined by a sigma value which controls the amount of blurring. A higher sigma value results in more blurring and a lower sigma value results in less blurring.
+        Then, I combined the low-frequency and high-frequency components to create the hybrid image.
+        I aligned the images by using the starter code provided by the staff.
+    </p>
+
+    <p>
+        When you see a hybrid image up close, the high frequency components dominate and you see more of the high-frequency image.
+        When you see a hybrid image from far away, the low frequency components dominate and you see more of the low-frequency image.
+        So, in the below example, you see the cat more clearly when the image is closer / bigger but you see Derek more clearly when the image is farther away / smaller.
+    </p>
+
+    <p>Below is the hybrid image of Derek and a cat:</p>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_2_DerekPicture.jpg" alt="closest" width="500">
+                    <figcaption>Derek</figcaption>
+                </figure>
+                <figure>
+                    <img src="images/part2_2_nutmeg.jpg" alt="closest" width="500">
+                    <figcaption>cat</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_2_nutmeg_derek.jpg" alt="closest" width="600">
+                    <figcaption>hybrid (close)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_2_nutmeg_derek.jpg" alt="closest" width="250">
+                    <figcaption>hybrid (far)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Below is another hybrid image along with the log fourier transforms:
+    </p>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_2_chow.jpeg" alt="closest" width="450">
+                    <figcaption>chow chow</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_2_chow_aligned.jpg" alt="closest" width="400">
+                    <figcaption>chow chow (aligned)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_2_bear_aligned.jpg" alt="closest" width="400">
+                    <figcaption>bear (aligned)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_2_bear.jpeg" alt="closest" width="450">
+                    <figcaption>bear</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_2_chow.jpeg" alt="closest" width="450">
+                    <figcaption>chow chow</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_2_chow_low.jpg" alt="closest" width="400">
+                    <figcaption>
+                        chow chow (low-frequency)<br>
+                        cutoff: 5
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_2_bear_high.jpg" alt="closest" width="400">
+                    <figcaption>
+                        bear (high-frequency)<br>
+                        cutoff: 12
+                    </figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_2_bear.jpeg" alt="closest" width="450">
+                    <figcaption>bear</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_2_bear_chow.jpg" alt="closest" width="800">
+                    <figcaption>hybrid (close)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_2_bear_chow.jpg" alt="closest" width="200">
+                    <figcaption>hybrid (far)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>Here is the frequency analysis:</p>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_2_chow_ft.jpg" alt="closest" width="300">
+                    <figcaption>chow chow</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_2_chow_low_ft.jpg" alt="closest" width="300">
+                    <figcaption>chow chow (low-frequency)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_2_hybrid_ft.jpg" alt="closest" width="300">
+                    <figcaption>hybrid</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_2_bear_high_ft.jpg" alt="closest" width="300">
+                    <figcaption>bear (high-frequency)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_2_bear_ft.jpg" alt="closest" width="300">
+                    <figcaption>bear</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>Below is another example of a hybrid image:</p>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_2_bunny.jpeg" alt="closest" width="400">
+                    <figcaption>bunny</figcaption>
+                </figure>
+                <figure>
+                    <img src="images/part2_2_teddy.jpeg" alt="closest" width="400">
+                    <figcaption>bear</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_2_bunny_teddy.jpg" alt="closest" width="650">
+                    <figcaption>hybrid (close)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_2_bunny_teddy.jpg" alt="closest" width="200">
+                    <figcaption>hybrid (far)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Part 2.3 and Part 2.4: Multiresolution Blending with the Gaussian and Laplacian Stacks</h2>
+
+    <p>
+        In this part, I implemented multiresolution blending with Gaussian and Laplacian stacks to blend two images together seamlessly.
+        I first created Gaussian stacks for both images by repeatedly applying a Gaussian filter and downsampling the image 5 times.
+        The sigma value for the Gaussian filter defines the amount of blurring between the two images. A higher sigma value results in more blurring and a lower sigma value results in less blurring.
+        Next, I created Laplacian stacks for both images by subtracting the current level of the Gaussian stack by the downsampled version of the next level of the Gaussian stack.
+        The last level of the Laplacian stack is the last level of the Gaussian stack.
+        Finally, I blended the two images together by combining their Laplacian stacks using a mask that defines which parts of each image to use.
+        The mask is a binary image where 1 represents the parts of the first image to use and 0 represents the parts of the second image to use.
+        I created two masks: one that is half and half and one that is a circle in the middle.
+    </p>
+
+    <p>
+        Below are the results of blending an apple and an orange using a half and half mask (following Figure 3.42 in <a href="https://www.dropbox.com/scl/fi/p33rod69w6tf61etn4ijr/SzeliskiBookDraft_20210828.pdf?rlkey=n4w0939o5s5jq09urfb1rl57i&dl=0">Szelski (Ed 2)</a>):
+    </p>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_3n4_apple_l0.jpg" alt="closest" width="400">
+                    <figcaption>apple (level 0)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_3n4_orange_l0.jpg" alt="closest" width="400">
+                    <figcaption>orange (level 0)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_3n4_oraple_l0.jpg" alt="closest" width="400">
+                    <figcaption>oraple (level 0)</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_3n4_apple_l2.jpg" alt="closest" width="400">
+                    <figcaption>apple (level 2)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_3n4_orange_l2.jpg" alt="closest" width="400">
+                    <figcaption>orange (level 2)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_3n4_oraple_l2.jpg" alt="closest" width="400">
+                    <figcaption>oraple (level 2)</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_3n4_apple_l4.jpg" alt="closest" width="400">
+                    <figcaption>apple (level 4)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_3n4_orange_l4.jpg" alt="closest" width="400">
+                    <figcaption>orange (level 4)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_3n4_oraple_l4.jpg" alt="closest" width="400">
+                    <figcaption>oraple (level 4)</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_3n4_apple.jpg" alt="closest" width="400">
+                    <figcaption>apple</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_3n4_orange.jpg" alt="closest" width="400">
+                    <figcaption>orange</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_3n4_oraple.jpg" alt="closest" width="400">
+                    <figcaption>oraple (sigma = 15)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Below are the results of blending a cow stuffed animal and a mickey mouse stuff animal using a half and half mask:
+    </p>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_3n4_cow.jpeg" alt="closest" width="600">
+                    <figcaption>cow</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_3n4_micow.jpg" alt="closest" width="600">
+                    <figcaption>micow (sigma = 8)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_3n4_mickey.jpeg" alt="closest" width="600">
+                    <figcaption>mickey</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Below are the results of blending a bear and a chow chow using a cicle mask in the center:
+    </p>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_3n4_bear2.jpg" alt="closest" width="600">
+                    <figcaption>bear</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_3n4_bow.jpg" alt="closest" width="600">
+                    <figcaption>bow bow (sigma = 8)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_3n4_chow2.jpeg" alt="closest" width="600">
+                    <figcaption>chow chow</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+
+</body>
+</html>
