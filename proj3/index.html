@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project 2</title>
+    <style>
+        body {
+            font-family: Calibri, Calibri;
+            width: 145%;
+            height: 100%;
+            padding: 0px;
+            margin-left: 2%;
+            transform: scale(0.67);
+            transform-origin: top left;
+        }
+        h1 {
+            font-size: 48px;
+        }
+
+        h2 {
+            font-size: 32px;
+        }
+
+        figcaption {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 5px;
+        }
+
+        p {
+            font-size: 24px;
+            margin: 40px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        table {
+            margin: auto;
+            border-collapse: collapse;
+            font-size: 24px;
+        }
+
+        td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 15px;
+            padding-top: 0px;
+        }
+
+        pre {
+            margin: 0;
+            padding-left: 0;
+            white-space: pre;
+        }
+
+        pre code {
+            font-size: 18px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Project 3: (Auto)stitching and Photo Mosaics</h1>
+
+    <h2>Part A.1: Shoot the Pictures</h2>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/gibby_centered.jpeg" alt="closest" width="600">
+                    <figcaption>fixed center of projection</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/gibby_rotated.jpeg" alt="closest" width="600">
+                    <figcaption>rotated</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/stairs_centered.jpeg" alt="closest" width="600">
+                    <figcaption>fixed center of projection</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/stairs_rotated.jpeg" alt="closest" width="600">
+                    <figcaption>rotated</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Part A.2: Recover Homographies</h2>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/gibby_rotated_annotated.jpg" alt="closest" width="600">
+                    <figcaption>img1</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/gibby_centered_annotated.jpg" alt="closest" width="600">
+                    <figcaption>img2</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <figure>
+        <img src="images/soe.jpeg" alt="closest" width="600">
+        <figcaption>system of equations</figcaption>
+    </figure>
+    <figure>
+        <img src="images/h_matrix.jpeg" alt="closest" width="600">
+        <figcaption>homography matrix</figcaption>
+    </figure>
+
+    <h2>Part A.3: Warp the Images</h2>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/dimoo.jpeg" alt="closest" width="450">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/dimoo_rectified_nn.jpg" alt="closest" width="450">
+                    <figcaption>nearest neighbor rectification</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/dimoo_rectified_bilinear.jpg" alt="closest" width="450">
+                    <figcaption>bilinear rectification</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/gibby_rotated.jpeg" alt="closest" width="450">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/gibby_rectified_nn.jpg" alt="closest" width="450">
+                    <figcaption>nearest neighbor rectification</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/gibby_rectified_bilinear.jpg" alt="closest" width="450">
+                    <figcaption>bilinear rectification</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Both interpolations produce very similar results. The bilinear interpolation is slightly smoother, but the difference is negligible. Nearest neighbor interpolation is faster to compute.
+    </p>
+
+    <h2>Part A.4: Blend the Images into a Mosaic</h2>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/gibby_centered.jpeg" alt="closest" width="600">
+                    <figcaption>original gibby</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/gibby_rotated.jpeg" alt="closest" width="600">
+                    <figcaption>rotated gibby</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/gibby_mosaic.jpg" alt="closest" width="1000">
+                    <figcaption>mosaic gibby</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/stairs_centered.jpeg" alt="closest" width="600">
+                    <figcaption>original stairs</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/stairs_rotated.jpeg" alt="closest" width="600">
+                    <figcaption>rotated stairs</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/stairs_mosaic.jpg" alt="closest" width="1000">
+                    <figcaption>mosaic stairs</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/bag_centered.jpeg" alt="closest" width="600">
+                    <figcaption>original bag</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/bag_rotated.jpeg" alt="closest" width="600">
+                    <figcaption>rotated bag</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/bag_mosaic.jpg" alt="closest" width="1000">
+                    <figcaption>mosaic bag</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        To create my mosaic, I set the centered image as the base image and warped the rotated image onto it.
+        I first got the corners of the object I was trying to overlap. Then, I computed H by calling computeH().
+        Next, I constructed my canvas by taking the width and height of both images and creating a bounding box for the warped image.
+        I took the x and y coordinate offsets and the new width and height to create a canvas of zeros with 3 channels.
+        After, I created an alpha mask for the same size with only one channel.
+        I got the alpha mask by setting the picels in the middle tobe 1 and 0 on the edges and used distance_transform_edt from scipy.ndimage.
+        Now, I can start putting in the images to my canvas.
+        Since I am using the centered image as my base, I put the entire image in the canvas at the offset locations and multiplied the alpha mask with it.
+        I also added the alpha mask value for the centered image to the overall alpha mask of the canvas.
+        Now, I warp the rotated image using bilinear interpolation and put it in the canvas at the offset locations.
+        I also multiply the warped image with the alpha mask and add the alpha mask value for the rotated image to the overall alpha mask of the canvas.
+        Lastly, I normalized the canvas by dividing it by the maximum value of the alpha mask.
+    </p>
+
+</body>
+</html>
