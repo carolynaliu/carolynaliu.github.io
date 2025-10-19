@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Project 2</title>
+    <title>Project 3</title>
     <style>
         body {
             font-family: Calibri, Calibri;
@@ -67,28 +67,28 @@
         <tr>
             <td>
                 <figure>
-                    <img src="images/gibby_centered.jpeg" alt="closest" width="600">
-                    <figcaption>fixed center of projection</figcaption>
+                    <img src="images/santorini_left.jpeg" alt="closest" width="800">
+                    <figcaption>santorini (fixed center of projection)</figcaption>
                 </figure>
             </td>
             <td>
                 <figure>
-                    <img src="images/gibby_rotated.jpeg" alt="closest" width="600">
-                    <figcaption>rotated</figcaption>
+                    <img src="images/santorini_right.jpeg" alt="closest" width="800">
+                    <figcaption>santorini (rotated)</figcaption>
                 </figure>
             </td>
         </tr>
         <tr>
             <td>
                 <figure>
-                    <img src="images/stairs_centered.jpeg" alt="closest" width="600">
-                    <figcaption>fixed center of projection</figcaption>
+                    <img src="images/ny_left.jpeg" alt="closest" width="800">
+                    <figcaption>new york (fixed center of projection)</figcaption>
                 </figure>
             </td>
             <td>
                 <figure>
-                    <img src="images/stairs_rotated.jpeg" alt="closest" width="600">
-                    <figcaption>rotated</figcaption>
+                    <img src="images/ny_right.jpeg" alt="closest" width="800">
+                    <figcaption>new york (rotated)</figcaption>
                 </figure>
             </td>
         </tr>
@@ -96,31 +96,60 @@
 
     <h2>Part A.2: Recover Homographies</h2>
 
+    <p>
+        To find the homography matrix given a set of points from image 1 and image 2, I set up a system of equations based on the homography transformation equations.
+        Each row of the system of equations corresponds to one point correspondence between the two images.
+        After constructing the system of equations, I used least squares to solve for the homography matrix.
+    </p>
+
+    <p>
+        Below are the coordinates I selected to compute the homography matrix:
+    </p>
+
     <table>
         <tr>
             <td>
                 <figure>
-                    <img src="images/gibby_rotated_annotated.jpg" alt="closest" width="600">
-                    <figcaption>img1</figcaption>
+                    <img src="images/part_a2_gibby_left_annotated.jpg" alt="closest" width="800">
+                    <figcaption>gibby (fixed center of projection)</figcaption>
                 </figure>
             </td>
             <td>
                 <figure>
-                    <img src="images/gibby_centered_annotated.jpg" alt="closest" width="600">
-                    <figcaption>img2</figcaption>
+                    <img src="images/part_a2_gibby_right_annotated.jpg" alt="closest" width="800">
+                    <figcaption>gibby (rotated)</figcaption>
                 </figure>
             </td>
         </tr>
     </table>
 
-    <figure>
-        <img src="images/soe.jpeg" alt="closest" width="600">
-        <figcaption>system of equations</figcaption>
-    </figure>
-    <figure>
-        <img src="images/h_matrix.jpeg" alt="closest" width="600">
-        <figcaption>homography matrix</figcaption>
-    </figure>
+    <p>
+        Below are the system of equations that were constructed to find the homography matrix:
+    </p>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part_a2_soe.jpeg" alt="closest" width="1000">
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Below is the homography matrix:
+    </p>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part_a2_h_matrix.jpeg" alt="closest" width="800">
+                </figure>
+            </td>
+        </tr>
+    </table>
 
     <h2>Part A.3: Warp the Images</h2>
 
@@ -128,47 +157,58 @@
         <tr>
             <td>
                 <figure>
-                    <img src="images/dimoo.jpeg" alt="closest" width="450">
-                    <figcaption>original</figcaption>
+                    <img src="images/part_a3_dimoo.jpeg" alt="closest" width="450">
+                    <figcaption>dimoo (original)</figcaption>
                 </figure>
             </td>
             <td>
                 <figure>
-                    <img src="images/dimoo_rectified_nn.jpg" alt="closest" width="450">
-                    <figcaption>nearest neighbor rectification</figcaption>
+                    <img src="images/part_a3_dimoo_rectified_nn.jpg" alt="closest" width="450">
+                    <figcaption>dimoo (nn rectification)</figcaption>
                 </figure>
             </td>
             <td>
                 <figure>
-                    <img src="images/dimoo_rectified_bilinear.jpg" alt="closest" width="450">
-                    <figcaption>bilinear rectification</figcaption>
+                    <img src="images/part_a3_dimoo_rectified_bilinear.jpg" alt="closest" width="450">
+                    <figcaption>dimoo (bilinear rectification)</figcaption>
                 </figure>
             </td>
         </tr>
         <tr>
             <td>
                 <figure>
-                    <img src="images/gibby_rotated.jpeg" alt="closest" width="450">
-                    <figcaption>original</figcaption>
+                    <img src="images/part_a3_gibby.jpeg" alt="closest" width="450">
+                    <figcaption>dibby (original)</figcaption>
                 </figure>
             </td>
             <td>
                 <figure>
-                    <img src="images/gibby_rectified_nn.jpg" alt="closest" width="450">
-                    <figcaption>nearest neighbor rectification</figcaption>
+                    <img src="images/part_a3_gibby_rectified_nn.jpg" alt="closest" width="450">
+                    <figcaption>dibby (nn rectification)</figcaption>
                 </figure>
             </td>
             <td>
                 <figure>
-                    <img src="images/gibby_rectified_bilinear.jpg" alt="closest" width="450">
-                    <figcaption>bilinear rectification</figcaption>
+                    <img src="images/part_a3_gibby_rectified_bilinear.jpg" alt="closest" width="450">
+                    <figcaption>gibby (bilinear rectification)</figcaption>
                 </figure>
             </td>
         </tr>
     </table>
 
     <p>
-        Both interpolations produce very similar results. The bilinear interpolation is slightly smoother, but the difference is negligible. Nearest neighbor interpolation is faster to compute.
+        I implemented two interpolation methods for image warping: nearest neighbor and bilinear interpolation.
+        The first thing I did was compute the homography matrix.
+        I also created an output image canvas by estimating the size of my object that I am warping (rectangle for the first one and square for the second).
+        Then, I iterated through every pixel in the output image and applied the inverse homography matrix to get the corresponding pixel location in the input image.
+        For nearest neighbor interpolation, I rounded the x and y coordinates to the nearest integer values and used those to index into the input image to get the pixel value.
+        For bilinear interpolation, I computed the four neighboring pixel values and their distances to the original pixel location.
+        Then, I calculated a weighted average of those four pixel values based on their distances to get the final pixel value.
+    </p>
+
+    <p>
+        Both interpolations produce very similar results. The bilinear interpolation is slightly smoother, but the difference is negligible.
+        However, nearest neighbor interpolation is faster to compute since we are only indexing into the image once and not doing any extra calculations.
     </p>
 
     <h2>Part A.4: Blend the Images into a Mosaic</h2>
@@ -177,24 +217,14 @@
         <tr>
             <td>
                 <figure>
-                    <img src="images/gibby_centered.jpeg" alt="closest" width="600">
-                    <figcaption>original gibby</figcaption>
+                    <img src="images/santorini_left.jpeg" alt="closest" width="800">
+                    <figcaption>santorini (image 1)</figcaption>
                 </figure>
             </td>
             <td>
                 <figure>
-                    <img src="images/gibby_rotated.jpeg" alt="closest" width="600">
-                    <figcaption>rotated gibby</figcaption>
-                </figure>
-            </td>
-        </tr>
-    </table>
-    <table>
-        <tr>
-            <td>
-                <figure>
-                    <img src="images/gibby_mosaic.jpg" alt="closest" width="1000">
-                    <figcaption>mosaic gibby</figcaption>
+                    <img src="images/santorini_right.jpeg" alt="closest" width="800">
+                    <figcaption>santorini (image 2)</figcaption>
                 </figure>
             </td>
         </tr>
@@ -203,14 +233,8 @@
         <tr>
             <td>
                 <figure>
-                    <img src="images/stairs_centered.jpeg" alt="closest" width="600">
-                    <figcaption>original stairs</figcaption>
-                </figure>
-            </td>
-            <td>
-                <figure>
-                    <img src="images/stairs_rotated.jpeg" alt="closest" width="600">
-                    <figcaption>rotated stairs</figcaption>
+                    <img src="images/part_a4_santorini_mosaic_manual.jpg" alt="closest" width="1500">
+                    <figcaption>santorini mosaic</figcaption>
                 </figure>
             </td>
         </tr>
@@ -219,8 +243,14 @@
         <tr>
             <td>
                 <figure>
-                    <img src="images/stairs_mosaic.jpg" alt="closest" width="1000">
-                    <figcaption>mosaic stairs</figcaption>
+                    <img src="images/ny_left.jpeg" alt="closest" width="800">
+                    <figcaption>new york (image 1)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/ny_right.jpeg" alt="closest" width="800">
+                    <figcaption>new york (image 2)</figcaption>
                 </figure>
             </td>
         </tr>
@@ -229,14 +259,8 @@
         <tr>
             <td>
                 <figure>
-                    <img src="images/bag_centered.jpeg" alt="closest" width="600">
-                    <figcaption>original bag</figcaption>
-                </figure>
-            </td>
-            <td>
-                <figure>
-                    <img src="images/bag_rotated.jpeg" alt="closest" width="600">
-                    <figcaption>rotated bag</figcaption>
+                    <img src="images/part_a4_ny_mosaic_manual.jpg" alt="closest" width="1500">
+                    <figcaption>new york mosaic</figcaption>
                 </figure>
             </td>
         </tr>
@@ -245,20 +269,36 @@
         <tr>
             <td>
                 <figure>
-                    <img src="images/bag_mosaic.jpg" alt="closest" width="1000">
-                    <figcaption>mosaic bag</figcaption>
+                    <img src="images/london_left.jpeg" alt="closest" width="800">
+                    <figcaption>london (image 1)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/london_right.jpeg" alt="closest" width="800">
+                    <figcaption>london (image 2)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part_a4_london_mosaic_manual.jpg" alt="closest" width="1500">
+                    <figcaption>london mosaic</figcaption>
                 </figure>
             </td>
         </tr>
     </table>
 
     <p>
-        To create my mosaic, I set the centered image as the base image and warped the rotated image onto it.
-        I first got the corners of the object I was trying to overlap. Then, I computed H by calling computeH().
+        To create my mosaic, I set the centered image (image 2) as the base image and warped the rotated image (image 1) onto it.
+        I first got 4 point correspondences from each image to compute the homography matrix.
         Next, I constructed my canvas by taking the width and height of both images and creating a bounding box for the warped image.
         I took the x and y coordinate offsets and the new width and height to create a canvas of zeros with 3 channels.
         After, I created an alpha mask for the same size with only one channel.
-        I got the alpha mask by setting the picels in the middle tobe 1 and 0 on the edges and used distance_transform_edt from scipy.ndimage.
+        I got the alpha mask by setting the pixels in the middle to be 1 and 0 on the edges and used distance_transform_edt from scipy.ndimage.
         Now, I can start putting in the images to my canvas.
         Since I am using the centered image as my base, I put the entire image in the canvas at the offset locations and multiplied the alpha mask with it.
         I also added the alpha mask value for the centered image to the overall alpha mask of the canvas.
@@ -266,6 +306,264 @@
         I also multiply the warped image with the alpha mask and add the alpha mask value for the rotated image to the overall alpha mask of the canvas.
         Lastly, I normalized the canvas by dividing it by the maximum value of the alpha mask.
     </p>
+
+    <p>
+        The alignment is not perfect because the photos were not taken from the exact same center of projection and I only use 4 point correspondences to compute the homography matrix.
+        This is especially noticeable in the santorini mosaic where there is some ghosting effects in certain areas and the change in lighting in the sky region causes some blending issues.
+    </p>
+
+    <h2>Part B.1: Harris Corner Detection</h2>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part_b1_santorini_corners.jpg" alt="closest" width="800">
+                    <figcaption>harris corners (without ANMS)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part_b1_santorini_corners_amns.jpg" alt="closest" width="800">
+                    <figcaption>harris corners (with ANMS)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+    
+    <p>
+        The photo on the left shows 500 detected corners using the Harris corner detection algorithm without applying ANMS.
+        You can see that many corners are clustered together in certain areas because the edges are more prominent and will have higher strength values.
+        The photo on the right shows the detected corners using the Harris corner detection algorithm with ANMS applied by only selecting the strongest corner in a certain radius until 500 corners are selected.
+        The corners are more evenly distributed throughout the image compared to the left image because of the radius constraint.
+    </p>
+
+    <h2>Part B.2: Feature Descriptor Extraction</h2>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part_b2_fd0.jpg" alt="closest" width="400">
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part_b2_fd1.jpg" alt="closest" width="400">
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part_b2_fd2.jpg" alt="closest" width="400">
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part_b2_fd3.jpg" alt="closest" width="400">
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        These are 4 feature descriptors at different corners locations from the previous image.
+        Each patch was sampled as a 40x40 window around the corner and then downsampled to an 8x8 window.
+        Finally, the 8x8 window was normalized to have a mean of 0 and a standard deviation of 1.
+    </p>
+
+    <h2>Part B.3: Feature Matching</h2>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part_b3_santorini_left_coords.jpg" alt="closest" width="800">
+                    <figcaption>harris corners for image 1</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part_b3_santorini_right_coords.jpg" alt="closest" width="800">
+                    <figcaption>harris corners for image 2</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part_b3_santorini_matching.jpg" alt="closest" width="1800">
+                    <figcaption>feature matching between image 1 and image 2</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        To match the features between two images, I first got the 250 strongest corners.
+        Then, I extracted the feature descriptors at those corner locations for both images.
+        For every feature in image 1, I compared its feature descriptor to every feature descriptor in image 2 by computing the distance between them using the L2 norm.
+        I found the two features with the closest distances and used them to compute the ratio.
+        If the ratio of the smallest distance to the second smallest distance was less than the threshold (0.8), the feature from image 1 and the closest feature from image 2 were considered a match.
+        You can see that there are a few matches that are incorrect but we will fix this by implementing RANSAC in the next part.
+    </p>
+
+
+    <h2>Part B.4: RANSAC for Robust Homography</h2>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/santorini_left.jpeg" alt="closest" width="800">
+                    <figcaption>santorini (image 1)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/santorini_right.jpeg" alt="closest" width="800">
+                    <figcaption>santorini (image 2)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part_a4_santorini_mosaic_manual.jpg" alt="closest" width="800">
+                    <figcaption>santorini mosaic (manual)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part_b4_santorini_mosaic.jpg" alt="closest" width="800">
+                    <figcaption>santorini mosaic (automatic)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        To have better feature matches, RANSAC was implemented to compute robust homography estimates.
+        In this algorithm, I randomly sampled 4 correspondences from the matched features and computed the homography matrix H.
+        Then, I projected all the points from image 1 to image 2 using the homography matrix and calculated the distance between the projected points and the actual points in image 2.
+        If the distance was less than a certain threshold (3 pixels), the correspondence was considered an inlier.
+        I repeated this process for a set number of iterations (10000 iterations) and returned a list of the best inliers which had the highest number of inliers.
+        After, I was able to use those inliers to create my mosaic instead of manually selecting the points from the image like I did in part A.
+    </p>
+
+    <p>
+        From the santorini mosaic, you can see that the images are aligned very well with minimal distortion.
+        If you look closely, there is still some ghosting effects in certain areas where the two images did not align perfectly because the photos were not taken from the exact same center of projection.
+        Additionally, there are some blending issues in the sky region where the colors do not match perfectly because the change in lighting.
+        However, the mosaic that uses RANSAC to compute the homography matrix looks much better than the manual mosaic because the feature matches are more accurate and there are more points to compute the homography matrix.
+    </p>
+
+    <p>
+        Below are a few more mosaics:
+    </p>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/ny_left.jpeg" alt="closest" width="800">
+                    <figcaption>new york (image 1)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/ny_right.jpeg" alt="closest" width="800">
+                    <figcaption>new york (image 2)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part_a4_ny_mosaic_manual.jpg" alt="closest" width="800">
+                    <figcaption>ny mosaic (manual)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part_b4_ny_mosaic.jpg" alt="closest" width="800">
+                    <figcaption>ny mosaic (automatic)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/london_left.jpeg" alt="closest" width="800">
+                    <figcaption>london (image 1)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/london_right.jpeg" alt="closest" width="800">
+                    <figcaption>london (image 2)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part_a4_london_mosaic_manual.jpg" alt="closest" width="800">
+                    <figcaption>london mosaic (manual)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part_b4_london_mosaic.jpg" alt="closest" width="800">
+                    <figcaption>london mosaic (automatic)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/paris_left.jpeg" alt="closest" width="800">
+                    <figcaption>paris (image 1)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/paris_right.jpeg" alt="closest" width="800">
+                    <figcaption>paris (image 2)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part_b4_paris_mosaic_manual.jpg" alt="closest" width="800">
+                    <figcaption>paris mosaic (manual)</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part_b4_paris_mosaic.jpg" alt="closest" width="800">
+                    <figcaption>paris mosaic (automatic)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
 
 </body>
 </html>
