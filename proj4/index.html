@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project 4</title>
+    <style>
+        body {
+            font-family: Calibri, Calibri;
+            width: 145%;
+            height: 100%;
+            padding: 0px;
+            margin-left: 2%;
+            transform: scale(0.67);
+            transform-origin: top left;
+        }
+        h1 {
+            font-size: 48px;
+        }
+
+        h2 {
+            font-size: 32px;
+        }
+
+        figcaption {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 5px;
+        }
+
+        p {
+            font-size: 24px;
+            margin: 40px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        table {
+            margin: auto;
+            border-collapse: collapse;
+            font-size: 24px;
+        }
+
+        td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 15px;
+            padding-top: 0px;
+        }
+
+        pre {
+            margin: 0;
+            padding-left: 0;
+            white-space: pre;
+        }
+
+        pre code {
+            font-size: 18px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Project 4: Neural Radiance Field</h1>
+
+    <h2>Part 0: Calibrating Your Camera and Capturing a 3D Scan</h2>
+
+    <p>
+        Here are two photos of my cloud of cameras in Viser:
+    </p>
+
+    <table style="border-collapse: collapse;">
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/part0_lafufu_cameras.jpg" alt="lafufu cloud of cameras" width="1000">
+                    <figcaption>lafufu dataset</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/part0_dimoo_cameras.jpg" alt="dimoo cloud of cameras" width="1000">
+                    <figcaption>dimoo dataset</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Part 1: Fit a Neural Field to a 2D Image</h2>
+
+    <p>
+        To reconstruct a 2D image using a neural network, I created a <code>PositionalEncoding</code> class that extends and an <code>MLP</code> class that both extends <code>torch.nn.Module</code>.
+        The <code>PositionalEncoding</code> class takes in the maximum frequency for encoding and computes the positional encoded coordinates by applying sine and cosine functions at different frequencies to the input coordinates in the <code>forward</code> function.
+        For my model architecture, I used a 4-layer MLP with positional encoding, ReLU activation functions, and used the Sigmoid function at the output layer to produce an RGB value.
+        I used mean squared error as my loss function and trained my network using the Adam optimizer with a learning rate of 0.001 for 1000 epochs.
+        Below is an image of the structure of my MLP with width 256:
+    </p>
+
+    <figure style="text-align: center;">
+        <img src="images/part1_mlp_structure.jpg" alt="mlp structure" width="800">
+    </figure>
+
+    <p>
+        Below is the training progression of my model on the fox image:
+    </p>
+
+    <table style="border-collapse: collapse;">
+        <tr>
+            <td style="padding: 0;">
+                <figure style="margin: 2px;">
+                    <img src="images/part1_fox_progress0.jpg" width="400">
+                    <figcaption>iteration 0</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 2px;">
+                    <img src="images/part1_fox_progress250.jpg" width="400">
+                    <figcaption>iteration 250</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 2px;">
+                    <img src="images/part1_fox_progress500.jpg" width="400">
+                    <figcaption>iteration 500</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 2px;">
+                    <img src="images/part1_fox_progress750.jpg" width="400">
+                    <figcaption>iteration 750</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 2px;">
+                    <img src="images/part1_fox_progress999.jpg" width="400">
+                    <figcaption>iteration 1000</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+
+    <p>
+        Below is the training progression on my own image of dogs:
+    </p>
+
+    <table style="border-collapse: collapse;">
+        <tr>
+            <td style="padding: 0;">
+                <figure style="margin: 2px;">
+                    <img src="images/part1_dog_progress0.jpg" width="400">
+                    <figcaption>iteration 0</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 2px;">
+                    <img src="images/part1_dog_progress250.jpg" width="400">
+                    <figcaption>iteration 250</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 2px;">
+                    <img src="images/part1_dog_progress500.jpg" width="400">
+                    <figcaption>iteration 500</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 2px;">
+                    <img src="images/part1_dog_progress750.jpg" width="400">
+                    <figcaption>iteration 750</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 2px;">
+                    <img src="images/part1_dog_progress999.jpg" width="400">
+                    <figcaption>iteration 1000</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Below are final results for different max posiitonal encoding frequencies and widths:
+    </p>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part1_L2_width64.jpg" alt="L 2 width 64" width="600">
+                    <figcaption>L = 2, width = 64</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part1_L2_width256.jpg" alt="L 2 width 256" width="600">
+                    <figcaption>L = 2, width = 256</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part1_L4_width64.jpg" alt="L 4 width 64" width="600">
+                    <figcaption>L = 4, width = 64</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part1_L4_width256.jpg" alt="L 4 width 256" width="600">
+                    <figcaption>L = 4, width = 256</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        You can see that increasing the width and max positional encoding frequency generally improves the quality of the reconstructed image, as the model is able to capture finer details.
+        When the max positional encoding frequency is too low, the model struggles to represent high-frequency details, resulting in a blurrier image.
+        When the width is too small, the model lacks the capacity to learn complex patterns, leading to simiplified reconstructions with more defined lines.
+    </p>
+
+    <p>
+        Here is the PSNR curve on the fox image:
+    </p>
+
+    <figure style="text-align: center;">
+        <img src="images/part1_psnr.jpg" alt="psnr curve" width="800">
+    </figure>
+
+    <h2>Part 2: Fit a Neural Radiance Field from Multi-view Images</h2>
+
+    <p>
+        <strong>Camera to World Coordinate Conversion</strong>: I created a function <code>transform</code> that takes in a c2w matrix and a point in camera space to return the corresponding point in world space.
+        To achieve this, I first converted the point to homogeneous coordinates by appending a 1.
+        Then, I multiplied the c2w matrix with the homogeneous point to get the point in world coordinates.
+        Finally, I converted back to Cartesian coordinates by dividing by the last component.
+    </p>
+
+    <p>
+        <strong>Pixel to Camera Coordinate Conversion</strong>: I created a function <code>pixel_to_camera</code> that takes in the camera's intrinsic matrix, pixel coordinates, and depth value to return the corresponding point in camera space.
+        Similar to <code>transform</code>, I first converted the pixel coordinates to homogeneous coordinates by appending a 1.
+        Then, I multiplied the inverse of the intrinsic matrix with the homogeneous pixel coordinates and scaled by the depth value to get the point in camera space.
+    </p>
+
+    <p>
+        <strong>Pixel to Ray</strong>: I created a function <code>pixel_to_ray</code> that takes in the camera's intrinsic matrix, c2w matrix, and pixel coordinates to return the ray origin and direction in world space.
+        I first found the ray origin by extracting the translation component from the c2w matrix.
+        Then, I used <code>pixel_to_camera</code> to get the point in camera space at depth 1.
+        Finally, I transformed this point to world space using <code>transform</code> and computed the ray direction by subtracting the ray origin from this point and normalizing the result.
+    </p>
+
+    <p>
+        <strong>Sampling Rays from Images</strong>: I created a function <code>sample_ray_from_images</code> that takes in images, the camera's instrinsic matrix, c2w matrices, and the number of images and rays to sample.
+        The function returns sampled ray origins, directions, and corresponding RGB values.
+        First, I randomly selected the specified number of images.
+        Then, for each selected image, I randomly sampled the specified number of pixel coordinates.
+        For each pixel, I used <code>pixel_to_ray</code> to get the ray origin and direction, and retrieved the RGB value from the image at that pixel.
+        Finally, I collected all the sampled ray origins, directions, and RGB values into arrays and returned them.
+    </p>
+
+    <p>
+        <strong>Sampling Points along Rays</strong>: I created a function <code>sample_point_from_rays</code> that takes in ray origins, directions, near and far bounds, and the number of samples to take along each ray.
+        The function returns sampled 3D points along each ray.
+        First, I generated evenly spaced depth values between the near and far bounds for each ray.
+        If we want to introduce some small pertubation, I added a random value to the depth values.
+        Then, for each ray, I computed the 3D points by adding the ray origin to the ray direction scaled by the depth values and returned the points.
+    </p>
+
+    <p>
+        <strong>Dataloader</strong>: I created a dataloader class <code>RaysData</code> that extends <code>torch.utils.data.Dataset</code>.
+        This class takes in images, the camera's instrinsic matrix, and the c2w matrices.
+        When initialized, I precompute all the ray origins, directions, and RGB values for all pixels in all images using <code>pixel_to_ray</code>.
+        The <code>__len__</code> method returns the total number of rays across all images.
+        The <code>__getitem__</code> method takes in an index and returns the corresponding ray origin, direction, and RGB value.
+        I also created a <code>sample_rays</code> function that randomly samples a specified number of rays from the dataset and returns their origins, directions, and RGB values.
+    </p>
+
+    <p>Below are the outputs of the visualization code:</p>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_cameras.jpg" alt="multi-camera samples" width="1000">
+                    <figcaption>samples from all cameras</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_camera.jpg" alt="single-camera samples" width="1000">
+                    <figcaption>samples from one camera</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        <strong>NeRF MLP</strong>: To reconstruct a 3D scene using NeRF, I created a <code>PositionalEncoding</code> class and an <code>NeRFMLP</code> class that both extend <code>torch.nn.Module</code>.
+        The <code>PositionalEncoding</code> class is the same as the one used in Part 1 for 2D image reconstruction.
+        The <code>NeRFMLP</code> class implements the NeRF architecture as described in the NeRF paper. Below is what the structure of my network looks like with width 256:
+    </p>
+
+    <figure style="text-align: center;">
+        <img src="images/part2_mlp_structure.jpg" alt="mlp structure" width="800">
+    </figure>
+
+    <p>
+        The network takes in 3D points and viewing directions, applies positional encoding to both, and processes them through multiple fully connected layers with ReLU activations.
+        The output consists of RGB color values and volume density (sigma) for each input point.
+        To prevent the density values from being zero, I applied a softplus activation function to the sigma output.
+    </p>
+
+    <p>
+        <strong>Volume Rendering</strong>: To find the rendered color, I created a <code>volrend</code> function that takes in the sigma values, RGB values, and step size between each sampled point along the ray.
+        I first find the non-terminating probabilities by multiplying the sigma values with the step size.
+        Then, I use <code>torch.cumsum</code> to compute the accumulated transmittance along the ray.
+        From there, I use the discrete approximation of the volume rendering equation to compute the rendered color.
+    </p>
+
+    <p style="font-size: 28px">
+        <strong>Now, to put it all together!!</strong>
+    </p>
+
+    <p>
+        I first create my camera intrinsic matrix and initialize my dataset using <code>RaysData</code> and a datalodaer with a batch size of 10000.
+        Then, I initialize my NeRF MLP model, mean squared error loss function, and Adam optimizer with a learning rate of 5e-4.
+        I will train my model for 1500 iterations and sample 64 points along each ray.
+        My near and far bounds are 2.0 and 6.0, respectively.
+    </p>
+
+    <p>
+        For each training iteration, I sample a batch of ray origins, directions, and RGB values from the dataloader.
+        Then, I use <code>sample_point_from_rays</code> to sample 64 points along each ray between the near and far bounds.
+        Using the sampled points and ray directions, I query my NeRF MLP to get the sigma and RGB values for each point.
+        Next, I use the <code>volrend</code> function to compute the rendered colors for each ray.
+        I then compute the mean squared error loss between the rendered colors and the ground truth RGB values.
+        Finally, I perform backpropagation and update the model parameters using the optimizer.
+    </p>
+
+    <p>
+        To show the training progression, I render an image from the camera view of the first image.
+        I take the ray origins and directions for all pixels in the first image and samaple 64 points along each ray.
+        Then, I query my NeRF MLP to get the sigma and RGB values for each point and use the <code>volrend</code> function to compute the rendered colors.
+    </p>
+
+    <p>
+        Below is the visualization of the rays and samples drawn at a single training step:
+    </p>
+
+    <figure style="text-align: center;">
+        <img src="images/part2_rays_samples.jpg" alt="rays samples" width="800">
+    </figure>
+
+    <p>
+        Below are the results at different training iterations:
+    </p>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_lego_progress0.jpg" alt="iteration 0" width="600">
+                    <figcaption>iteration 0</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_lego_progress300.jpg" alt="iteration 300" width="600">
+                    <figcaption>iteration 300</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_lego_progress600.jpg" alt="iteration 600" width="600">
+                    <figcaption>iteration 600</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_lego_progress900.jpg" alt="iteration 900" width="600">
+                    <figcaption>iteration 900</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_lego_progress1200.jpg" alt="iteration 1200" width="600">
+                    <figcaption>iteration 1200</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_lego_progress1499.jpg" alt="iteration 1500" width="600">
+                    <figcaption>iteration 1500</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        To get the PSNR value at each iteration on the validation set, I render images from the camera views of all validation images using the same process as above.
+        Then, I compute the PSNR between the rendered images and the ground truth validation images and take the average PSNR across all validation images.
+        Below is the PSNR curve over the training iterations:
+    </p>
+
+    <figure style="text-align: center;">
+        <img src="images/part2_psnr.jpg" alt="psnr curve" width="600">
+    </figure>
+
+    <p>
+        To produce the final novel view image, I take the c2w matrices from the test set and render images from those camera views using the model I have trained.
+        I follow the same rendering process as above where I sample points along each ray, query the NeRF MLP, and use volume rendering to get the final pixel colors.
+    </p>
+
+    <p>
+        Below is a spherical rendering of the lego:
+    </p>
+
+    <figure style="text-align: center;">
+        <img src="images/part2_lego_gif.gif" alt="lego gif" width="600">
+    </figure>
+
+    <p style="font-size: 28px">
+        <strong>Now, I train on my own data!</strong>
+    </p>
+
+    <p>
+        I took 50 photos of a Dimoo figurine from different angles using my phone camera.
+        I created a dataset containing the images, c2w matrices, and the camera intrinsic matrix (from my code in Part 0).
+        Then, I trained my NeRF MLP model on this dataset using the same training procedure as above.
+        I played around with different hyperparameters such as the number of iterations, number of samples per ray, and the near and far bounds to get the best results.
+        The final result uses 10000 iterations, 64 samples per ray, near and far bounds of 1.5 and 3.6, respectively, and a learning rate of 1e-3.
+    </p>
+
+    <p>
+        Below are the results at different training iterations (the black lines on the edges are because the images are undistorted):
+    </p>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_dimoo_progress1.jpg" alt="dimoo iteration 1" width="600">
+                    <figcaption>iteration 1</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_dimoo_progress250.jpg" alt="dimoo iteration 250" width="600">
+                    <figcaption>iteration 250</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_dimoo_progress500.jpg" alt="dimoo iteration 500" width="600">
+                    <figcaption>iteration 500</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_dimoo_progress1000.jpg" alt="dimoo iteration 1000" width="600">
+                    <figcaption>iteration 1000</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_dimoo_progress2000.jpg" alt="dimoo iteration 2000" width="600">
+                    <figcaption>iteration 2000</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_dimoo_progress4000.jpg" alt="dimoo iteration 4000" width="600">
+                    <figcaption>iteration 4000</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_dimoo_progress8000.jpg" alt="dimoo iteration 8000" width="600">
+                    <figcaption>iteration 8000</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_dimoo_progress9999.jpg" alt="dimoo iteration 10000" width="600">
+                    <figcaption>iteration 10000</figcaption>
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_dimoo_reference.jpeg" alt="dimoo reference" width="600">
+                    <figcaption>reference</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Below is a novel view rendering of my Dimoo figurine:
+    </p>
+
+    <figure style="text-align: center;">
+        <img src="images/part2_dimoo_gif.gif" alt="dimoo gif" width="600">
+    </figure>
+
+    <p>
+        Below is the plot of training loss and psnr over all iterations:
+    </p>
+
+    <table>
+        <tr>
+            <td>
+                <figure>
+                    <img src="images/part2_dimoo_psnr.jpg" alt="psnr curve" width="800">
+                </figure>
+            </td>
+            <td>
+                <figure>
+                    <img src="images/part2_dimoo_loss.jpg" alt="loss curve" width="800">
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+</body>
