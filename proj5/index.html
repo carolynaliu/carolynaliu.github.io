@@ -1,0 +1,2892 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project 5</title>
+    <style>
+        body {
+            font-family: Calibri, Calibri;
+            width: 145%;
+            height: 100%;
+            padding: 0px;
+            margin-left: 2%;
+            transform: scale(0.67);
+            transform-origin: top left;
+        }
+        h1 {
+            font-size: 48px;
+        }
+
+        h2 {
+            font-size: 32px;
+        }
+
+        figcaption {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 5px;
+        }
+
+        p {
+            font-size: 24px;
+            margin: 40px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        table {
+            margin: auto;
+            border-collapse: collapse;
+            font-size: 24px;
+        }
+
+        td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 15px;
+            padding-top: 0px;
+        }
+
+        pre {
+            margin: 0;
+            padding-left: 0;
+            white-space: pre;
+        }
+
+        pre code {
+            font-size: 18px;
+            font-family: monospace;
+        }
+
+        .prompt-list {
+            font-size: 20px;
+            margin-left: 40px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Project 5: Fun With Diffusion Models!</h1>
+
+    <h2>Part A.0: Setup</h2>
+
+    <p>
+        These are the text prompts I generated embeddings for:
+    </p>
+    <ul class="prompt-list">
+        <li>"a photo of a golden retriver rolling on grass"</li>
+        <li>"a photo of a bunny sitting on a windowsill"</li>
+        <li>"a pencil drawing of a dachshund"</li>
+        <li>"an oil paiting of a cat curled up by a fireplace"</li>
+        <li>"a pencil drawing of a tutle with a patterned shell"</li>
+        <li>"a photo of a playful puppy running on the beach"</li>
+    </ul>
+
+    <table style="border-collapse: collapse;">
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part0_image1_steps20.png" alt="beach puppy" width="400">
+                    <figcaption>"a photo of a flayful puppy running on the beach" (num_inference_steps: 20)</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part0_image2_steps20.png" alt="dimoo cloud of cameras" width="400">
+                    <figcaption>"an oil painting of a cat curled up by a fireplace" (num_inference_steps: 20)</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part0_image3_steps20.png" alt="dimoo cloud of cameras" width="400">
+                    <figcaption>"a photo of a golden retriver rolling on grass" (num_inference_steps: 20)</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part0_image1_steps500.png" alt="lafufu cloud of cameras" width="400">
+                    <figcaption>"a photo of a flayful puppy running on the beach"(num_inference_steps: 500)</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part0_image2_steps500.png" alt="dimoo cloud of cameras" width="400">
+                    <figcaption>"an oil painting of a cat curled up by a fireplace" (num_inference_steps: 500)</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part0_image3_steps500.png" alt="dimoo cloud of cameras" width="400">
+                    <figcaption>"a photo of a golden retriver rolling on grass" (num_inference_steps: 500)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        When the number of ingerence steps increases, the quality of the generatedd images improves significantly and follows the text prompts more closely.
+        With only 20 inference steps, the images lack detail. For example, in the first image of the puppy on the beach, the puppy's features are not very distinct and lacks fur and the sand looks untouched which is unrealistic if the puppy was running on it.
+        In contrast, with 500 inference steps, the puppy's fur texture is more defined, and the sand shows signs of disturbance from the puppy's movement, making the scene more believable.
+        Similarly, the cat by the fireplace image and the dog on the grass image both show significant improvements in detail and visualizes the prompt more accurately of the actions and settings described.
+    </p>
+
+    <p>
+        The random seed I set for this part was 100.
+    </p>
+
+    <h2>Part A.1.1: Implementing the Forward Process</h2>
+
+    <p>
+        To implement the forward diffusion process, I created a function <code>forward</code> that takes in the original image and a timestep.
+        To compute the noisy image, I sampled random Gaussian noise and used the noise coefficient to use the following formula to get the noise image:
+    </p>
+
+    <figure style="text-align: center;">
+        <img src="images/parta_part1_1_formula.png" alt="forward formula" width="500">
+    </figure>
+
+    <p>
+        Below is the image of the Campanile at different timesteps in the forward process:
+    </p>
+
+    <table style="border-collapse: collapse;">
+        <tr>
+            <td style="padding: 5;">
+                <figure style="margin: 2px;">
+                    <img src="images/parta_part1_3_original.png" width="400">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 5;">
+                <figure style="margin: 2px;">
+                    <img src="images/parta_part1_1_t250.png" width="400">
+                    <figcaption>t = 250</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 5;">
+                <figure style="margin: 2px;">
+                    <img src="images/parta_part1_1_t500.png" width="400">
+                    <figcaption>t = 500</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 5;">
+                <figure style="margin: 2px;">
+                    <img src="images/parta_part1_1_t750.png" width="400">
+                    <figcaption>t = 750</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Part A.1.2: Classical Denoising</h2>
+
+    <p>
+        Below is the image of the Campanile before and after applying Gaussian filtering at each timestep:
+    </p>
+
+    <table style="border-collapse: collapse;">
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_1_t250.png" width="400">
+                    <figcaption>t = 250</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_1_t500.png" width="400">
+                    <figcaption>t = 500</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_1_t750.png" width="400">
+                    <figcaption>t = 750</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_2_t250.png" width="400">
+                    <figcaption>t = 250</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_2_t500.png" width="400">
+                    <figcaption>t = 500</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_2_t750.png" width="400">
+                    <figcaption>t = 750</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Part A.1.3 One-Step Denoising</h2>
+
+    <p>
+        To implement one-step denoising, I first used <code>forward</code> from the previous part to add noise to the original image at different timesteps.
+        Then, I used a pretrained UNet model to estimate the amount of noise in the noisy image.
+        Lastly, I estimated the original image by subtracting the noise estimate and following the same formula from Part A.1.1.
+    </p>
+
+    <p>
+        Below is the original image, noisy image, and estimate of the original image of the Campanile at different timesteps:
+    </p>
+
+    <table style="border-collapse: collapse;">
+        <tr>
+            <td colspan="3" style="padding: 0; text-align: center;">
+                <figure>
+                    <img src="images/parta_part1_3_original.png" width="400">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_3_t250_noisy.png" width="400">
+                    <figcaption>noisy (t = 250)</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_3_t500_noisy.png" width="400">
+                    <figcaption>noisy (t = 500)</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_3_t750_noisy.png" width="400">
+                    <figcaption>noisy (t = 750)</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_3_t250_estimate.png" width="400">
+                    <figcaption>estimate (t = 250)</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_3_t500_estimate.png" width="400">
+                    <figcaption>estimate (t = 500)</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_3_t750_estimate.png" width="400">
+                    <figcaption>estimate (t = 750)</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Part A.1.4 Iterative Denoising</h2>
+
+    <p>
+        To implement iterative denoising, I created a <code>iterative_denoise</code> function that takes in a noisy image and a starting timestep.
+        The function continuously loops through the timesteps starting at the given starting timestep.
+        In each iteration, I use the pretrained UNet model to estimate the noise in the current image and then find the less noisy image at the next timestep using the following formula:
+    </p>
+
+    <figure style="text-align: center;">
+        <img src="images/parta_part1_4_formula.png" alt="iterative denoising formula" width="500">
+    </figure>
+
+    <p>
+        Below is the image of the Campanile at different timesteps during the iterative denoising process:
+    </p>
+
+    <table style="border-collapse: collapse;">
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_4_t90_estimate.png" width="250">
+                    <figcaption>t = 90</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_4_t240_estimate.png" width="250">
+                    <figcaption>t = 240</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_4_t390_estimate.png" width="250">
+                    <figcaption>t = 390</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_4_t540_estimate.png" width="250">
+                    <figcaption>t = 540</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_4_t690_estimate.png" width="250">
+                    <figcaption>t = 690</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Below is the comparison of the original Campanile image and different denoising images:
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_3_original.png" width="400">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_4_iterative.png" width="400">
+                    <figcaption>iterative denoising</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_4_one_step.png" width="400">
+                    <figcaption>one-step denoising</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_4_gaussian.png" width="400">
+                    <figcaption>gaussian denoising</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Part A.1.5 Diffusion Model Sampling</h2>
+
+    <p>
+        Below are 5 sampled imags generated from random noise using the diffusion model:
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_5_image0.png" width="300">
+                    <figcaption>sample 1</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_5_image1.png" width="300">
+                    <figcaption>sample 2</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_5_image2.png" width="300">
+                    <figcaption>sample 3</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_5_image3.png" width="300">
+                    <figcaption>sample 4</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_5_image4.png" width="300">
+                    <figcaption>sample 5</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Part A.1.6 Classifier-Free Guidance</h2>
+
+    <p>
+        To improve the image quality from a noisy image, I implemented classifier-free guidance by computing a conditional and an unconditional noise estimate.
+        In my <code>iterative_denoice_cfg</code> function, I implemented a similar process to <code>iterative_denoise</code> from Part A.1.4, but in each iteration, I computed both the conditional and unconditional noise estimates using the pretrained UNet model.
+        Then, I combined the two estimates using a guidance scale factor to get a final noise estimate.
+        Finally, I used the final noise estimate to compute the less noisy image at the next timestep using the same formula from Part A.1.4.
+    </p>
+
+    <p>
+        Below are 5 sampled images generated from random noise using <code>"a high quality photo"</code> text prompt:
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_6_image0.png" width="300">
+                    <figcaption>sample 1</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_6_image1.png" width="300">
+                    <figcaption>sample 2</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_6_image2.png" width="300">
+                    <figcaption>sample 3</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_6_image3.png" width="300">
+                    <figcaption>sample 4</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_6_image4.png" width="300">
+                    <figcaption>sample 5</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Part A.1.7 Image-to-Image Translation</h2>
+
+    <p>
+        Below are estimated images from different noise levels using CFG with the conditional text prompt <code>"a high quality photo"</code>:
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_campanile_step1.png" width="200">
+                    <figcaption>starting index: 1</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_campanile_step3.png" width="200">
+                    <figcaption>starting index: 3</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_campanile_step5.png" width="200">
+                    <figcaption>starting index: 5</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_campanile_step7.png" width="200">
+                    <figcaption>starting index: 7</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_campanile_step10.png" width="200">
+                    <figcaption>starting index: 10</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_campanile_step20.png" width="200">
+                    <figcaption>starting index: 20</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_3_original.png" width="200">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_bear_step1.png" width="200">
+                    <figcaption>starting index: 1</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_bear_step3.png" width="200">
+                    <figcaption>starting index: 3</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_bear_step5.png" width="200">
+                    <figcaption>starting index: 5</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_bear_step7.png" width="200">
+                    <figcaption>starting index: 7</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_bear_step10.png" width="200">
+                    <figcaption>starting index: 10</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_bear_step20.png" width="200">
+                    <figcaption>starting index: 20</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_bear.jpeg" width="200">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_kodak_step1.png" width="200">
+                    <figcaption>starting index: 1</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_kodak_step3.png" width="200">
+                    <figcaption>starting index: 3</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_kodak_step5.png" width="200">
+                    <figcaption>starting index: 5</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_kodak_step7.png" width="200">
+                    <figcaption>starting index: 7</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_kodak_step10.png" width="200">
+                    <figcaption>starting index: 10</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_kodak_step20.png" width="200">
+                    <figcaption>starting index: 20</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_kodak.jpeg" width="200">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Part A.1.7.1 Editing Hand-Drawn and Web Image</h2>
+
+    <p>
+        Below is an estimate of a web image from different noise levels using CFG with the conditional text prompt <code>"a high quality photo"</code>:
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_pug_step1.png" width="200">
+                    <figcaption>starting index: 1</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_pug_step3.png" width="200">
+                    <figcaption>starting index: 3</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_pug_step5.png" width="200">
+                    <figcaption>starting index: 5</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_pug_step7.png" width="200">
+                    <figcaption>starting index: 7</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_pug_step10.png" width="200">
+                    <figcaption>starting index: 10</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_pug_step20.png" width="200">
+                    <figcaption>starting index: 20</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_pug.png" width="200">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Below is an estimate of drawings from different noise levels using CFG with the conditional text prompt <code>"a high quality photo"</code>:
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_cake_step1.png" width="200">
+                    <figcaption>starting index: 1</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_cake_step3.png" width="200">
+                    <figcaption>starting index: 3</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_cake_step5.png" width="200">
+                    <figcaption>starting index: 5</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_cake_step7.png" width="200">
+                    <figcaption>starting index: 7</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_cake_step10.png" width="200">
+                    <figcaption>starting index: 10</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_cake_step20.png" width="200">
+                    <figcaption>starting index: 20</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_cake.png" width="200">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_grape_step1.png" width="200">
+                    <figcaption>starting index: 1</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_grape_step3.png" width="200">
+                    <figcaption>starting index: 3</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_grape_step5.png" width="200">
+                    <figcaption>starting index: 5</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_grape_step7.png" width="200">
+                    <figcaption>starting index: 7</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_grape_step10.png" width="200">
+                    <figcaption>starting index: 10</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_grape_step20.png" width="200">
+                    <figcaption>starting index: 20</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_1_grape.png" width="200">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Part A.1.7.2 Inpainting</h2>
+
+    <p>
+        To implement inpainting, I created an <code>inpaint</code> function that takes in an image and a mask to estimate the masked part of the image.
+        I followed a similar process to <code>iterative_denoise_cfg</code> from Part A.1.6, but in each iteration, I combined the noisy image and the original image using the mask to ensure that only the masked part is denoised.
+    </p>
+
+    <p>
+        Below are original images, masked images, and inpainted images:
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_3_original.png" width="400">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_2_mask_campanile.png" width="400">
+                    <figcaption>mask</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_2_replace_campanile.png" width="400">
+                    <figcaption>to replace</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_2_campanile.png" width="400">
+                    <figcaption>inpainted</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_bear.jpeg" width="400">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_2_mask_bear.png" width="400">
+                    <figcaption>mask</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_2_replace_bear.png" width="400">
+                    <figcaption>to replace</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_2_bear.png" width="400">
+                    <figcaption>inpaint</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_2_chowchow.png" width="400">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_2_mask_chowchow.png" width="400">
+                    <figcaption>mask</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_2_replace_chowchow.png" width="400">
+                    <figcaption>to replace</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_2_chowchow.png" width="400">
+                    <figcaption>inpaint</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Part A.1.7.3 Text-Conditional Image-to-Image Translation</h2>
+
+    <p>
+        Below are the given text prompt and the estimated image at each noise level using CFG:
+    </p>
+
+    <p>
+        text prompt: <code>"a photo of a dog"</code>
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_campanile_step1.png" width="200">
+                    <figcaption>starting index: 1</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_campanile_step3.png" width="200">
+                    <figcaption>starting index: 3</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_campanile_step5.png" width="200">
+                    <figcaption>starting index: 5</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_campanile_step7.png" width="200">
+                    <figcaption>starting index: 7</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_campanile_step10.png" width="200">
+                    <figcaption>starting index: 10</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_campanile_step20.png" width="200">
+                    <figcaption>starting index: 20</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_3_original.png" width="200">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        text prompt: <code>"a photo of the amalfi coast"</code>
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_china_step1.png" width="200">
+                    <figcaption>starting index: 1</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_china_step3.png" width="200">
+                    <figcaption>starting index: 3</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_china_step5.png" width="200">
+                    <figcaption>starting index: 5</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_china_step7.png" width="200">
+                    <figcaption>starting index: 7</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_china_step10.png" width="200">
+                    <figcaption>starting index: 10</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_china_step20.png" width="200">
+                    <figcaption>starting index: 20</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_china.jpeg" width="200">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        text prompt: <code>"an oil painting of a snowy mountain village"</code>
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_newyork_step1.png" width="200">
+                    <figcaption>starting index: 1</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_newyork_step3.png" width="200">
+                    <figcaption>starting index: 3</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_newyork_step5.png" width="200">
+                    <figcaption>starting index: 5</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_newyork_step7.png" width="200">
+                    <figcaption>starting index: 7</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_newyork_step10.png" width="200">
+                    <figcaption>starting index: 10</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_newyork_step20.png" width="200">
+                    <figcaption>starting index: 20</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_7_3_newyork.jpeg" width="200">
+                    <figcaption>original</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Part A.1.8 Visual Anagrams</h2>
+
+    <p>
+        To implement Visual Anagrams and create optical illusions with diffusion models, I created a function <code>visual_anagrams</code> that takes in two text prompts and a random noisy image.
+        Following a similar process to <code>iterative_denoise_cfg</code> from Part A.1.6, in each iteration, I computed two conditional noise estimates using the pretrained UNet model for both text prompts on the original image and the flipped image.
+        Then, I found the less noisy image for the both and flipped the flipped image back before combining them into an average image.
+    </p>
+
+    <p>
+        Below are illusions and their corresponding text prompts:
+    </p>
+
+    <p>
+        <code>"an oil painting of an old man"</code> + <code>"an oil painting of people around a campfire"</code>
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_8_image1.png" width="500">
+                    <figcaption>"an oil painting of an old man"</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_8_image1.png" width="500" style="transform: rotate(180deg)">
+                    <figcaption>"an oil painting of people around a campfire"</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        <code>"a photo of a bunny sitting on a windowsill"</code> + <code>"a photo of a dog"</code>
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_8_image2.png" width="500">
+                    <figcaption>"a photo of a bunny sitting on a windowsill"</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_8_image2.png" width="500" style="transform: rotate(180deg)">
+                    <figcaption>"a photo of a dog"</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        <code>"a pencil drawing of a dachshund"</code> + <code>"a pencil drawing of a turtle with a patterned shell"</code>
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_8_image3.png" width="500">
+                    <figcaption>"a pencil drawing of a dachshund"</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_8_image3.png" width="500" style="transform: rotate(180deg)">
+                    <figcaption>"a pencil drawing of a turtle with a patterned shell"</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+    
+    <h2>Part A.1.9 Hybrid Images</h2>
+
+    <p>
+        To create hybrid images, I created a function <code>make_hybrids</code> that takes in two text prompts and a random noisy image.
+        Following a similar process to <code>iterative_denoise_cfg</code> from Part A.1.6, in each iteration, I computed two conditional noise estimates using the pretrained UNet model for both text prompts.
+        Then, I put one image through a high-pass filter and the other image through a low-pass filter before combining them into a single hybrid image.
+    </p>
+
+    <p>
+        Below are hybrid images and their corresponding text prompts:
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_9_image1.png" width="400">
+                    <figcaption><code>"a lithograph of waterfalls"</code> + <code>"a lithograph of a skull"</code></figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_9_image2.png" width="400">
+                    <figcaption><code>"a lithograph of waterfalls"</code> + <code>"a photo of the amalfi coast"</code></figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/parta_part1_9_image3.png" width="400">
+                    <figcaption><code>"an oil painting of a snowy mountain village"</code> + <code>"a photo of a golden retriever rolling on grass"</code></figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Part B.1.2 Using the UNet to Train a Denoiser</h2>
+
+    <p>
+        Below are images of the noising process over different sigma values from the denoiser:
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_noise0.0.png" width="200">
+                    <figcaption>sigma = 0.0</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_noise0.2.png" width="200">
+                    <figcaption>sigma = 0.2</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_noise0.4.png" width="200">
+                    <figcaption>sigma = 0.4</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_noise0.5.png" width="200">
+                    <figcaption>sigma = 0.5</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_noise0.6.png" width="200">
+                    <figcaption>sigma = 0.6</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_noise0.8.png" width="200">
+                    <figcaption>sigma = 0.8</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_noise1.0.png" width="200">
+                    <figcaption>sigma = 1.0</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Part B.1.2.1 Training</h2>
+
+    <p>
+        Below is the training loss curve for training the denoiser using the UNet architecture with sigma = 0.5:
+    </p>
+
+    <figure style="text-align: center;">
+        <img src="images/partb_part1_2_1_loss_curve.png" alt="training loss curve" width="600">
+        <figcaption>training loss curve</figcaption>
+    </figure>
+
+    <p>
+        Below are denoised images with noise level 0.5 after the first epoch:
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_1_e0_sample1_input.png" width="400">
+                    <figcaption>input image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_1_e0_sample1_noisy.png" width="400">
+                    <figcaption>noisy image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_1_e0_sample1_output.png" width="400">
+                    <figcaption>denoised image</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_1_e0_sample2_input.png" width="400">
+                    <figcaption>input image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_1_e0_sample2_noisy.png" width="400">
+                    <figcaption>noisy image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_1_e0_sample2_output.png" width="400">
+                    <figcaption>denoised image</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_1_e0_sample3_input.png" width="400">
+                    <figcaption>input image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_1_e0_sample3_noisy.png" width="400">
+                    <figcaption>noisy image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_1_e0_sample3_output.png" width="400">
+                    <figcaption>denoised image</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Below are denoised images with noise level 0.5 after the fifth epoch:
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_1_e4_sample1_input.png" width="400">
+                    <figcaption>input image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_1_e4_sample1_noisy.png" width="400">
+                    <figcaption>noisy image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_1_e4_sample1_output.png" width="400">
+                    <figcaption>denoised image</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_1_e4_sample2_input.png" width="400">
+                    <figcaption>input image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_1_e4_sample2_noisy.png" width="400">
+                    <figcaption>noisy image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_1_e4_sample2_output.png" width="400">
+                    <figcaption>denoised image</figcaption>
+                </figure>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_1_e4_sample3_input.png" width="400">
+                    <figcaption>input image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_1_e4_sample3_noisy.png" width="400">
+                    <figcaption>noisy image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_1_e4_sample3_output.png" width="400">
+                    <figcaption>denoised image</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Part B.1.2.2 Out-of-Distribution Testing</h2>
+
+    <p>
+        Below are denoised image with out-of-distribution noise levels after the model is trained:
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_2_noisy0.0.png" width="200">
+                    <figcaption>sigma = 0.0</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_2_noisy0.2.png" width="200">
+                    <figcaption>sigma = 0.2</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_2_noisy0.4.png" width="200">
+                    <figcaption>sigma = 0.4</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_2_noisy0.5.png" width="200">
+                    <figcaption>sigma = 0.5</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_2_noisy0.6.png" width="200">
+                    <figcaption>sigma = 0.6</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_2_noisy0.8.png" width="200">
+                    <figcaption>sigma = 0.8</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_2_noisy1.0.png" width="200">
+                    <figcaption>sigma = 1.0</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Part B.1.2.3 Denoising Pure Noise</h2>
+
+    <p>
+        Below is the training loss curve for denoising pure noise using the UNet architecture:
+    </p>
+
+    <figure style="text-align: center;">
+        <img src="images/partb_part1_2_3_loss_curve.png" alt="training loss curve" width="600">
+        <figcaption>training loss curve</figcaption>
+    </figure>
+
+    <p>
+        Below are denoised images after the first epoch:
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_3_e0_sample1_noisy.png" width="250">
+                    <figcaption>noisy image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_3_e0_sample1_output.png" width="250">
+                    <figcaption>denoised image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_3_e0_sample2_noisy.png" width="250">
+                    <figcaption>noisy image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_3_e0_sample2_output.png" width="250">
+                    <figcaption>denoised image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_3_e0_sample3_noisy.png" width="250">
+                    <figcaption>noisy image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_3_e0_sample3_output.png" width="250">
+                    <figcaption>denoised image</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Below are denoised images after the fifth epoch:
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_3_e4_sample1_noisy.png" width="250">
+                    <figcaption>noisy image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_3_e4_sample1_output.png" width="250">
+                    <figcaption>denoised image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_3_e4_sample2_noisy.png" width="250">
+                    <figcaption>noisy image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_3_e4_sample2_output.png" width="250">
+                    <figcaption>denoised image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_3_e4_sample3_noisy.png" width="250">
+                    <figcaption>noisy image</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part1_2_3_e4_sample3_output.png" width="250">
+                    <figcaption>denoised image</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        From the outputs, the model outputs mostly the same thing regardless of the input noise. The output also does not display a specific digit but rather a blend of multiple digits / features.
+    </p>
+    
+    <h2>Part B.2.2 Training the UNet</h2>
+
+    <p>
+        Below is the training loss curve for training the UNet architecture on CIFAR-10 dataset:
+    </p>
+
+    <figure style="text-align: center;">
+        <img src="images/partb_part2_2_loss_curve.png" alt="training loss curve" width="600">
+        <figcaption>training loss curve</figcaption>
+    </figure>
+
+    <h2>Part B.2.3 Sampling from the UNet</h2>
+
+    <p>
+        Below are results from the time-conditioned UNet after the first epoch:
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part2_3_e0_sample0.png" width="400">
+                    <figcaption>sample 1</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part2_3_e0_sample1.png" width="400">
+                    <figcaption>sample 2</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part2_3_e0_sample2.png" width="400">
+                    <figcaption>sample 3</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part2_3_e0_sample3.png" width="400">
+                    <figcaption>sample 4</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Below are results from the time-conditioned UNet after the fifth epoch:
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part2_3_e4_sample0.png" width="400">
+                    <figcaption>sample 1</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part2_3_e4_sample1.png" width="400">
+                    <figcaption>sample 2</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part2_3_e4_sample2.png" width="400">
+                    <figcaption>sample 3</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part2_3_e4_sample3.png" width="400">
+                    <figcaption>sample 4</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Below are results from the time-conditioned UNet after the tenth epoch:
+    </p>
+
+    <table>
+        <tr>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part2_3_e9_sample0.png" width="400">
+                    <figcaption>sample 1</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part2_3_e9_sample1.png" width="400">
+                    <figcaption>sample 2</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part2_3_e9_sample2.png" width="400">
+                    <figcaption>sample 3</figcaption>
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure>
+                    <img src="images/partb_part2_3_e9_sample3.png" width="400">
+                    <figcaption>sample 4</figcaption>
+                </figure>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Part B.2.5 Training the UNet</h2>
+
+    <p>
+        Below is the training loss curve for training the class-conditioned UNet architecture on CIFAR-10 dataset:
+    </p>
+
+    <figure style="text-align: center;">
+        <img src="images/partb_part2_5_loss_curve.png" alt="training loss curve" width="600">
+        <figcaption>training loss curve</figcaption>
+    </figure>
+
+    <h2>Part B.2.6 Sampling from the UNet</h2>
+
+    <p>
+        Below are results from the class-conditioned UNet after the first epoch:
+    </p>
+
+    <table>
+        <tr style="padding: 0;">
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit0_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit1_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit2_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit3_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit4_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit5_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit6_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit7_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit8_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit9_sample0.png" width="150">
+                </figure>
+            </td>
+        </tr>
+        <tr style="padding: 0;">
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit0_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit1_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit2_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit3_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit4_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit5_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit6_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit7_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit8_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit9_sample1.png" width="150">
+                </figure>
+            </td>
+        </tr>
+        <tr style="padding: 0;">
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit0_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit1_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit2_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit3_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit4_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit5_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit6_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit7_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit8_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit9_sample2.png" width="150">
+                </figure>
+            </td>
+            <tr>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit0_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit1_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit2_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit3_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit4_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit5_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit6_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit7_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit8_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit9_sample3.png" width="150">
+                </figure>
+            </td>
+        </tr>
+        </tr>
+    </table>
+
+    <p>
+        Below are results from the class-conditioned UNet after the fifth epoch:
+    </p>
+
+    <table>
+        <tr style="padding: 0;">
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit0_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit1_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit2_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit3_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit4_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit5_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit6_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit7_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit8_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit9_sample0.png" width="150">
+                </figure>
+            </td>
+        </tr>
+        <tr style="padding: 0;">
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit0_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit1_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit2_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit3_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit4_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit5_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit6_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit7_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit8_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit9_sample1.png" width="150">
+                </figure>
+            </td>
+        </tr>
+        <tr style="padding: 0;">
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit0_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit1_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit2_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit3_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit4_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit5_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit6_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit7_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit8_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit9_sample2.png" width="150">
+                </figure>
+            </td>
+            <tr>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit0_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit1_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit2_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit3_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit4_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit5_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit6_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit7_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit8_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit9_sample3.png" width="150">
+                </figure>
+            </td>
+        </tr>
+        </tr>
+    </table>
+
+    <p>
+        Below are results from the class-conditioned UNet after the tenth epoch:
+    </p>
+
+    <table>
+        <tr style="padding: 0;">
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit0_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit1_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit2_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit3_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit4_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit5_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit6_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit7_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit8_sample0.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit9_sample0.png" width="150">
+                </figure>
+            </td>
+        </tr>
+        <tr style="padding: 0;">
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit0_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit1_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit2_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit3_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit4_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit5_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit6_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit7_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit8_sample1.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit9_sample1.png" width="150">
+                </figure>
+            </td>
+        </tr>
+        <tr style="padding: 0;">
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit0_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit1_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit2_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit3_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit4_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit5_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit6_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit7_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit8_sample2.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit9_sample2.png" width="150">
+                </figure>
+            </td>
+            <tr>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit0_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit1_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit2_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit3_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit4_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit5_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit6_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit7_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit8_sample3.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit9_sample3.png" width="150">
+                </figure>
+            </td>
+        </tr>
+        </tr>
+    </table>
+
+    <p>
+        To remove the learning rate scheduler, I changed the learning rate from 1e-2 to 1e-3.
+    </p>
+
+    <p>
+        Below are results from the class-conditioned UNet after the first epoch with no scheduler:
+    </p>
+
+    <table>
+        <tr style="padding: 0;">
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit0_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit1_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit2_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit3_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit4_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit5_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit6_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit7_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit8_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit9_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+        </tr>
+        <tr style="padding: 0;">
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit0_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit1_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit2_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit3_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit4_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit5_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit6_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit7_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit8_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit9_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+        </tr>
+        <tr style="padding: 0;">
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit0_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit1_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit2_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit3_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit4_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit5_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit6_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit7_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit8_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit9_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <tr>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit0_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit1_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit2_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit3_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit4_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit5_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit6_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit7_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit8_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e0_digit9_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+        </tr>
+        </tr>
+    </table>
+
+    <p>
+        Below are results from the class-conditioned UNet after the fifth epoch with no scheduler:
+    </p>
+
+    <table>
+        <tr style="padding: 0;">
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit0_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit1_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit2_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit3_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit4_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit5_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit6_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit7_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit8_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit9_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+        </tr>
+        <tr style="padding: 0;">
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit0_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit1_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit2_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit3_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit4_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit5_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit6_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit7_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit8_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit9_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+        </tr>
+        <tr style="padding: 0;">
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit0_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit1_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit2_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit3_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit4_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit5_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit6_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit7_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit8_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit9_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <tr>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit0_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit1_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit2_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit3_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit4_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit5_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit6_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit7_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit8_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e4_digit9_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+        </tr>
+        </tr>
+    </table>
+
+    <p>
+        Below are results from the class-conditioned UNet after the tenth epoch with no scheduler:
+    </p>
+
+    <table>
+        <tr style="padding: 0;">
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit0_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit1_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit2_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit3_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit4_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit5_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit6_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit7_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit8_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit9_sample0_no_sched.png" width="150">
+                </figure>
+            </td>
+        </tr>
+        <tr style="padding: 0;">
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit0_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit1_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit2_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit3_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit4_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit5_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit6_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit7_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit8_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit9_sample1_no_sched.png" width="150">
+                </figure>
+            </td>
+        </tr>
+        <tr style="padding: 0;">
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit0_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit1_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit2_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit3_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit4_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit5_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit6_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit7_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit8_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit9_sample2_no_sched.png" width="150">
+                </figure>
+            </td>
+            <tr>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit0_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit1_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit2_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit3_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit4_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit5_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit6_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit7_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit8_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+            <td style="padding: 0;">
+                <figure style="margin: 0;">
+                    <img src="images/partb_part2_6_e9_digit9_sample3_no_sched.png" width="150">
+                </figure>
+            </td>
+        </tr>
+        </tr>
+    </table>
+    
+</body>
